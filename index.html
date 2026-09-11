@@ -221,7 +221,6 @@
           }
         });
 
-        // Suscripción Realtime para actualizar slots y credenciales instantáneamente
         db.channel('public:inscripciones')
           .on('postgres_changes', { event: '*', schema: 'public', table: 'inscripciones' }, () => {
             if (state.usuarioActual) this.cargarSlotsYEdo();
@@ -275,13 +274,11 @@
       async cargarSlotsYEdo() {
         Views.mostrar('view-slots');
         
-        // Obtener configuración de sala y pagos
         const { data: config } = await db.from('configuracion_admin').select('*').eq('id', 1).maybeSingle();
         state.configuracionSala = config;
 
         const { data: inscripciones } = await db.from('inscripciones').select('*');
         
-        // Verificar si el usuario ya está inscrito en algún slot
         state.casillaMia = inscripciones ? inscripciones.find(i => i.j1_apodo === state.perfilActual.nickname) : null;
 
         const roomContainer = document.getElementById('room-container');
@@ -293,7 +290,7 @@
           document.getElementById('room-details').innerHTML = `Sala ID: <b>${config.room_id}</b> | Contraseña: <b>${config.room_pass}</b>`;
         } else if (state.casillaMia) {
           roomContainer.classList.add('hidden');
-          waitingActions.classList.remove('hidden'); // Muestra botón para apurar admin
+          waitingActions.classList.remove('hidden');
         } else {
           roomContainer.classList.add('hidden');
           waitingActions.classList.add('hidden');
@@ -309,7 +306,7 @@
           let infoText = '<i>Disponible</i>';
 
           if (reg) {
-            const es Mio = reg.j1_apodo === state.perfilActual.nickname;
+            const esMio = reg.j1_apodo === state.perfilActual.nickname;
             const confirmado = reg.j1_pago_confirmado;
             estadoHTML = confirmado ? '<span style="color:var(--success);">[Confirmado]</span>' : '<span style="color:#ffb703;">[Pendiente]</span>';
             infoText = `Jugador: <b>${reg.j1_apodo}</b>`;
@@ -320,7 +317,6 @@
               btnHTML = `<button class="btn-slot" style="opacity:0.5;" disabled>Ocupado</button>`;
             }
           } else {
-            // Validar que el usuario no esté en otro slot antes de dejarlo unir
             if (state.casillaMia) {
               btnHTML = `<button class="btn-slot" style="opacity:0.5;" disabled>Ya inscrito</button>`;
             } else {
