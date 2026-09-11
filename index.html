@@ -389,9 +389,7 @@
               j1_id: id_ff,
               j1_wsp: wsp,
               j1_nro_operacion: nroOp,
-              j1_pago_confirmado: false,
-              room_id: 'Por definir',
-              room_pass: 'Por definir'
+              j1_pago_confirmado: false
             };
             const { error } = await db.from('inscripciones').insert([payload]);
             if (error) throw error;
