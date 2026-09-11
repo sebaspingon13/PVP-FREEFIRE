@@ -202,6 +202,14 @@
 
     return {
       async init() {
+        const { data: { session } } = await db.auth.getSession();
+        if (session) {
+          state.usuarioActual = session.user;
+          await this.cargarPerfil();
+        } else {
+          Views.mostrar('view-auth');
+        }
+
         db.auth.onAuthStateChange(async (event, session) => {
           if (session) {
             state.usuarioActual = session.user;
@@ -214,7 +222,7 @@
 
         db.channel('public:inscripciones')
           .on('postgres_changes', { event: '*', schema: 'public', table: 'inscripciones' }, () => {
-            if (state.usuarioActual) this.cargarDuelos();
+            if (state.usuarioActual && state.perfilActual) this.cargarDuelos();
           })
           .subscribe();
       },
@@ -304,21 +312,29 @@
             const esJ1 = reg.j1_apodo === nicknameActual;
             const esJ2 = reg.j2_apodo === nicknameActual;
             const completo = reg.j1_apodo && reg.j2_apodo;
+            const ambosPagados = reg.j1_pago_confirmado && reg.j2_pago_confirmado;
 
             if (completo) {
-              estadoHTML = (reg.j1_pago_confirmado && reg.j2_pago_confirmado) ? '<span style="color:var(--success);">[Duelo Confirmado]</span>' : '<span style="color:#ffb703;">[Esperando Pago de ambos]</span>';
+              estadoHTML = ambosPagados ? '<span style="color:var(--success);">[Duelo Confirmado]</span>' : '<span style="color:#ffb703;">[Esperando Pago de ambos]</span>';
             } else {
               estadoHTML = '<span style="color:#ffb703;">[Falta Rival 1v1]</span>';
             }
 
             infoText = `⚔️ <b>${reg.j1_apodo}</b> vs <b>${reg.j2_apodo || 'Esperando oponente...'}</b>`;
 
-            if (esJ1 || esJ2) {
-              const roomId = reg.room_id || 'Por definir';
-              const roomPass = reg.room_pass || 'Por definir';
+            const soyParte = esJ1 || esJ2;
+            const salaValida = reg.room_id && reg.room_id !== 'Por definir';
+
+            if (soyParte && ambosPagados && salaValida) {
               credencialesHTML = `
                 <div style="margin-top: 6px; background: rgba(0,242,195,0.08); border: 1px dashed var(--success); padding: 6px 8px; border-radius: 6px; font-size: 12px;">
-                  🔑 Sala ID: <b>${roomId}</b> | Pass: <b>${roomPass}</b>
+                  🔑 Sala ID: <b>${reg.room_id}</b> | Pass: <b>${reg.room_pass}</b>
+                </div>
+              `;
+            } else if (soyParte) {
+              credencialesHTML = `
+                <div style="margin-top: 6px; background: rgba(255,183,3,0.08); border: 1px dashed #ffb703; padding: 6px 8px; border-radius: 6px; font-size: 12px; color:#ffb703;">
+                  ⏳ Esperando confirmación de pagos / credenciales por el admin
                 </div>
               `;
             }
