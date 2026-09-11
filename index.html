@@ -175,7 +175,7 @@
 
       <label>CÓDIGO DE OPERACIÓN YAPE</label>
       <input type="text" id="yape_nro_op" required placeholder="Ej: 0548921">
-      <button type="submit">ENVIAR PAGO Y PARTICIPAR</button>
+      <button type="submit" id="btn-enviar-pago">ENVIAR PAGO Y PARTICIPAR</button>
     </form>
     <button class="btn-sec" onclick="App.mostrarSlots()">Volver atrás</button>
   </div>
@@ -243,7 +243,6 @@
         const inputNick = document.getElementById('prof_nickname');
         inputNick.value = state.perfilActual.nickname || '';
         
-        // Bloquear edición de nombre si ya está en un slot
         if (miDuelo) {
           inputNick.disabled = true;
           inputNick.title = "No puedes cambiar tu apodo mientras estés inscrito en un duelo.";
@@ -314,7 +313,6 @@
 
             infoText = `⚔️ <b>${reg.j1_apodo}</b> vs <b>${reg.j2_apodo || 'Esperando oponente...'}</b>`;
 
-            // Mostrar ID y Contraseña de sala independientes al costado si el usuario pertenece a esta sala
             if (esJ1 || esJ2) {
               const roomId = reg.room_id || 'Por definir';
               const roomPass = reg.room_pass || 'Por definir';
@@ -372,41 +370,52 @@
 
       async procesarInscripcion(e) {
         e.preventDefault();
-        const tipo = document.getElementById('input-accion-tipo').value;
-        const nroOp = document.getElementById('yape_nro_op').value.trim();
-        const nick = state.perfilActual.nickname;
-        const id_ff = state.perfilActual.id_freefire;
-        const wsp = state.perfilActual.whatsapp;
+        const btnSubmit = document.getElementById('btn-enviar-pago');
+        btnSubmit.disabled = true;
+        btnSubmit.innerText = "PROCESANDO...";
 
-        if (tipo === 'crear_j1') {
-          const casillaNum = parseInt(document.getElementById('input-casilla-num').value);
-          const payload = {
-            numero_casilla: casillaNum,
-            j1_apodo: nick,
-            j1_id: id_ff,
-            j1_wsp: wsp,
-            j1_nro_operacion: nroOp,
-            j1_pago_confirmado: false,
-            room_id: 'Por definir',
-            room_pass: 'Por definir'
-          };
-          const { error } = await db.from('inscripciones').insert([payload]);
-          if (error) return alert("Error al crear duelo: " + error.message);
-        } else {
-          const dueloId = parseInt(document.getElementById('input-casilla-id').value);
-          const payload = {
-            j2_apodo: nick,
-            j2_id: id_ff,
-            j2_wsp: wsp,
-            j2_nro_operacion: nroOp,
-            j2_pago_confirmado: false
-          };
-          const { error } = await db.from('inscripciones').update(payload).eq('id', dueloId);
-          if (error) return alert("Error al unirse: " + error.message);
+        try {
+          const tipo = document.getElementById('input-accion-tipo').value;
+          const nroOp = document.getElementById('yape_nro_op').value.trim();
+          const nick = state.perfilActual.nickname;
+          const id_ff = state.perfilActual.id_freefire;
+          const wsp = state.perfilActual.whatsapp;
+
+          if (tipo === 'crear_j1') {
+            const casillaNum = parseInt(document.getElementById('input-casilla-num').value);
+            const payload = {
+              numero_casilla: casillaNum,
+              j1_apodo: nick,
+              j1_id: id_ff,
+              j1_wsp: wsp,
+              j1_nro_operacion: nroOp,
+              j1_pago_confirmado: false,
+              room_id: 'Por definir',
+              room_pass: 'Por definir'
+            };
+            const { error } = await db.from('inscripciones').insert([payload]);
+            if (error) throw error;
+          } else {
+            const dueloId = parseInt(document.getElementById('input-casilla-id').value);
+            const payload = {
+              j2_apodo: nick,
+              j2_id: id_ff,
+              j2_wsp: wsp,
+              j2_nro_operacion: nroOp,
+              j2_pago_confirmado: false
+            };
+            const { error } = await db.from('inscripciones').update(payload).eq('id', dueloId);
+            if (error) throw error;
+          }
+
+          alert("¡Inscripción PVP registrada con éxito! Espera la validación del administrador.");
+          this.cargarDuelos();
+        } catch (err) {
+          alert("Error al registrar inscripción: " + err.message);
+        } finally {
+          btnSubmit.disabled = false;
+          btnSubmit.innerText = "ENVIAR PAGO Y PARTICIPAR";
         }
-
-        alert("¡Inscripción PVP registrada con éxito! Espera la validación del administrador.");
-        this.cargarDuelos();
       },
 
       async salirDuelo(id, rol, completo) {
