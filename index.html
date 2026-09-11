@@ -325,6 +325,7 @@
             const soyParte = esJ1 || esJ2;
             const salaValida = reg.room_id && reg.room_id !== 'Por definir';
 
+            // Mostrar sala al costado si está confirmado y se tienen credenciales permanentes
             if (soyParte && ambosPagados && salaValida) {
               credencialesHTML = `
                 <div style="margin-top: 6px; background: rgba(0,242,195,0.08); border: 1px dashed var(--success); padding: 6px 8px; border-radius: 6px; font-size: 12px;">
