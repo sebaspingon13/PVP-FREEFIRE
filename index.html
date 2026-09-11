@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Torneo Free Fire - Jugadores</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Rajdhani:wght@500;600;700&display=swap');
+
+    :root {
+      --bg: #050308;
+      --card-bg: rgba(16, 10, 24, 0.92);
+      --primary: #b537f2;
+      --primary-light: #d68bff;
+      --primary-dark: #6d1b9e;
+      --yape: #742284;
+      --yape-light: #a32dbb;
+      --text: #ffffff;
+      --subtext: #a99cc2;
+      --border: rgba(181, 55, 242, 0.18);
+      --success: #00f2c3;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Rajdhani', sans-serif;
+      background: radial-gradient(circle at top, #170c22 0%, #020103 70%);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: 20px 15px;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 620px;
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      padding: 26px;
+      border-radius: 20px;
+      border: 1px solid rgba(181, 55, 242, 0.35);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85);
+      position: relative;
+    }
+
+    h1 {
+      font-family: 'Teko', sans-serif;
+      text-align: center;
+      color: var(--primary-light);
+      font-size: 40px;
+      margin: 0;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .subtitle { text-align: center; color: var(--subtext); font-size: 13px; margin-bottom: 20px; }
+
+    .user-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(181, 55, 242, 0.12);
+      padding: 10px 14px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      border: 1px solid var(--border);
+    }
+
+    label { display: block; margin-bottom: 6px; font-size: 12px; color: var(--subtext); font-weight: 700; }
+    input {
+      width: 100%; padding: 12px; margin-bottom: 14px;
+      background: rgba(5, 3, 8, 0.85); border: 1px solid var(--border);
+      color: white; border-radius: 10px; font-family: 'Rajdhani', sans-serif;
+    }
+    input:focus { outline: none; border-color: var(--primary); }
+
+    button {
+      width: 100%; padding: 12px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      border: none; color: white; font-family: 'Teko', sans-serif; font-size: 20px;
+      border-radius: 10px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
+    }
+
+    .btn-google { background: #ea4335; margin-bottom: 10px; }
+    .btn-facebook { background: #1877f2; margin-bottom: 10px; }
+    .btn-sec { background: transparent; border: 1px solid var(--border); color: var(--subtext); margin-top: 10px; font-size: 16px; }
+    .btn-small { width: auto; padding: 4px 10px; font-size: 14px; border-radius: 6px; }
+
+    .yape-box {
+      background: rgba(116, 34, 132, 0.4);
+      border: 1px solid var(--yape-light);
+      border-radius: 14px; padding: 18px; text-align: center; margin-bottom: 15px;
+    }
+    .yape-title { color: #d175ed; font-family: 'Teko', sans-serif; font-size: 24px; margin: 0; }
+    .yape-number { font-size: 26px; font-weight: 700; color: #fff; margin: 6px 0; }
+
+    .slots-grid { display: flex; flex-direction: column; gap: 10px; max-height: 50vh; overflow-y: auto; padding-right: 4px; }
+    .slot-card {
+      background: rgba(20, 10, 30, 0.85);
+      border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .slot-num { font-family: 'Teko', sans-serif; font-size: 20px; color: #fff; }
+    .slot-players { font-size: 13px; color: var(--subtext); }
+    .btn-slot { width: auto; padding: 6px 14px; font-size: 15px; }
+
+    .room-info-card {
+      background: rgba(0, 242, 195, 0.1);
+      border: 1px solid var(--success);
+      padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: center;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- VISTA 0: AUTENTICACIÓN SOCIAL -->
+  <div id="view-auth">
+    <h1>Torneo Free Fire</h1>
+    <p class="subtitle">Inicia sesión con tu correo o red social</p>
+    <button class="btn-google" onclick="App.loginSocial('google')">Continuar con Google</button>
+    <button class="btn-facebook" onclick="App.loginSocial('facebook')">Continuar con Facebook</button>
+  </div>
+
+  <!-- VISTA 1: CREAR / EDITAR PERFIL -->
+  <div id="view-profile" class="hidden">
+    <h2 id="profile-title" style="font-family:'Teko'; text-align:center; font-size:28px; margin:0 0 10px;">Ficha del Jugador</h2>
+    <p class="subtitle">Completa tus datos personales</p>
+    <form id="form-perfil" onsubmit="App.guardarPerfil(event)">
+      <label>NICKNAME</label>
+      <input type="text" id="prof_nickname" required placeholder="Ej: Shadow99">
+      <label>ID DE FREE FIRE</label>
+      <input type="text" id="prof_id" required placeholder="Ej: 987654321">
+      <label>WHATSAPP</label>
+      <input type="text" id="prof_wsp" required placeholder="Ej: 987654321">
+      <button type="submit">GUARDAR PERFIL</button>
+    </form>
+    <button id="btn-cancel-profile" class="btn-sec hidden" onclick="App.mostrarSlots()">Volver</button>
+  </div>
+
+  <!-- VISTA 2: LISTA DE ESPERA (10 SLOTS EN TIEMPO REAL) -->
+  <div id="view-slots" class="hidden">
+    <h1>Lista de Espera (10 Slots)</h1>
+    
+    <div class="user-bar">
+      <span>Jugador: <b id="user-nickname-display">-</b></span>
+      <div>
+        <button class="btn-small" onclick="App.abrirFormularioEditar()" style="background:#2d3748;">✏️ Perfil</button>
+        <button class="btn-small" onclick="App.cerrarSesion()" style="background:#1a202c;">Salir</button>
+      </div>
+    </div>
+
+    <!-- Credenciales de Sala en vivo (Aparece solo si está confirmado) -->
+    <div id="room-container" class="hidden room-info-card">
+      <h3 style="margin:0 0 5px; color:var(--success); font-family:'Teko'; font-size:22px;">¡SALA CONFIRMADA!</h3>
+      <p id="room-details" style="margin:0; font-size:16px; font-weight:bold;"></p>
+    </div>
+
+    <!-- Botón para apurar administradores si está pendiente -->
+    <div id="waiting-actions" class="hidden" style="margin-bottom:15px; text-align:center;">
+      <button onclick="App.apurarAdmin()" style="background:#ffb703; color:#000; font-size:16px; padding:8px;">🔔 Recordar / Apurar Administrador</button>
+    </div>
+
+    <p class="subtitle">Selecciona una casilla libre. Solo puedes unirte a una a la vez.</p>
+    <div id="slots-container" class="slots-grid">Cargando slots...</div>
+  </div>
+
+  <!-- VISTA 3: PAGO YAPE -->
+  <div id="view-form-casilla" class="hidden">
+    <h2 id="casilla-form-title" style="font-family:'Teko'; text-align:center; font-size:28px; margin:0 0 10px;">Yapear e Inscribirse</h2>
+    
+    <div class="yape-box">
+      <div class="yape-title">YAPE A NOMBRE DE: SEBAS</div>
+      <div class="yape-number" id="yape-num-display">📱 +51 930 263 051</div>
+    </div>
+
+    <form id="form-casilla-accion" onsubmit="App.procesarInscripcion(event)">
+      <input type="hidden" id="input-casilla-num">
+      <label>CÓDIGO DE OPERACIÓN YAPE</label>
+      <input type="text" id="yape_nro_op" required placeholder="Ej: 0548921">
+      <button type="submit">ENVIAR PAGO Y ESPERAR CONFIRMACIÓN</button>
+    </form>
+    <button class="btn-sec" onclick="App.mostrarSlots()">Volver atrás</button>
+  </div>
+
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://eaqagfaarjsonclcpahd.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVhcWFnZmFhcmpzb25jbGNwYWhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzODc2NDIsImV4cCI6MjEwMzk2MzY0Mn0.-9b9qzfJ4oZANgQdLTy2vYTMbfj1ffiTEVrQY-QSYPs';
+
+  const App = (() => {
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const TOTAL_SLOTS = 10;
+    let state = { usuarioActual: null, perfilActual: null, casillaMia: null, configuracionSala: null };
+
+    const Views = {
+      ocultarTodas() {
+        ['view-auth', 'view-profile', 'view-slots', 'view-form-casilla'].forEach(id => {
+          document.getElementById(id).classList.add('hidden');
+        });
+      },
+      mostrar(id) { this.ocultarTodas(); document.getElementById(id).classList.remove('hidden'); }
+    };
+
+    return {
+      async init() {
+        db.auth.onAuthStateChange(async (event, session) => {
+          if (session) {
+            state.usuarioActual = session.user;
+            await this.cargarPerfil();
+          } else {
+            state.usuarioActual = null;
+            Views.mostrar('view-auth');
+          }
+        });
+
+        // Suscripción Realtime para actualizar slots y credenciales instantáneamente
+        db.channel('public:inscripciones')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'inscripciones' }, () => {
+            if (state.usuarioActual) this.cargarSlotsYEdo();
+          })
+          .subscribe();
+
+        db.channel('public:configuracion_admin')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'configuracion_admin' }, () => {
+            if (state.usuarioActual) this.cargarSlotsYEdo();
+          })
+          .subscribe();
+      },
+
+      async loginSocial(provider) {
+        await db.auth.signInWithOAuth({ provider, options: { redirectTo: window.location.href } });
+      },
+
+      async cargarPerfil() {
+        const { data } = await db.from('perfiles').select('*').eq('id', state.usuarioActual.id).maybeSingle();
+        if (data) {
+          state.perfilActual = data;
+          document.getElementById('user-nickname-display').innerText = data.nickname;
+          this.cargarSlotsYEdo();
+        } else {
+          Views.mostrar('view-profile');
+        }
+      },
+
+      abrirFormularioEditar() {
+        document.getElementById('prof_nickname').value = state.perfilActual.nickname || '';
+        document.getElementById('prof_id').value = state.perfilActual.id_freefire || '';
+        document.getElementById('prof_wsp').value = state.perfilActual.whatsapp || '';
+        document.getElementById('btn-cancel-profile').classList.remove('hidden');
+        Views.mostrar('view-profile');
+      },
+
+      async guardarPerfil(e) {
+        e.preventDefault();
+        const payload = {
+          id: state.usuarioActual.id,
+          nickname: document.getElementById('prof_nickname').value.trim(),
+          id_freefire: document.getElementById('prof_id').value.trim(),
+          whatsapp: document.getElementById('prof_wsp').value.trim()
+        };
+        const { error } = await db.from('perfiles').upsert([payload]);
+        if (error) return alert("Error: " + error.message);
+        alert("¡Perfil guardado!");
+        await this.cargarPerfil();
+      },
+
+      async cargarSlotsYEdo() {
+        Views.mostrar('view-slots');
+        
+        // Obtener configuración de sala y pagos
+        const { data: config } = await db.from('configuracion_admin').select('*').eq('id', 1).maybeSingle();
+        state.configuracionSala = config;
+
+        const { data: inscripciones } = await db.from('inscripciones').select('*');
+        
+        // Verificar si el usuario ya está inscrito en algún slot
+        state.casillaMia = inscripciones ? inscripciones.find(i => i.j1_apodo === state.perfilActual.nickname) : null;
+
+        const roomContainer = document.getElementById('room-container');
+        const waitingActions = document.getElementById('waiting-actions');
+
+        if (state.casillaMia && state.casillaMia.j1_pago_confirmado) {
+          roomContainer.classList.remove('hidden');
+          waitingActions.classList.add('hidden');
+          document.getElementById('room-details').innerHTML = `Sala ID: <b>${config.room_id}</b> | Contraseña: <b>${config.room_pass}</b>`;
+        } else if (state.casillaMia) {
+          roomContainer.classList.add('hidden');
+          waitingActions.classList.remove('hidden'); // Muestra botón para apurar admin
+        } else {
+          roomContainer.classList.add('hidden');
+          waitingActions.classList.add('hidden');
+        }
+
+        const container = document.getElementById('slots-container');
+        container.innerHTML = '';
+
+        for (let i = 1; i <= TOTAL_SLOTS; i++) {
+          const reg = inscripciones ? inscripciones.find(item => item.numero_casilla === i) : null;
+          let estadoHTML = '<span style="color:#00f2fe;">[Libre]</span>';
+          let btnHTML = '';
+          let infoText = '<i>Disponible</i>';
+
+          if (reg) {
+            const es Mio = reg.j1_apodo === state.perfilActual.nickname;
+            const confirmado = reg.j1_pago_confirmado;
+            estadoHTML = confirmado ? '<span style="color:var(--success);">[Confirmado]</span>' : '<span style="color:#ffb703;">[Pendiente]</span>';
+            infoText = `Jugador: <b>${reg.j1_apodo}</b>`;
+
+            if (esMio) {
+              btnHTML = `<button class="btn-slot" style="background:#d9534f;" onclick="App.salirDeSlot(${reg.id})">Cancelar</button>`;
+            } else {
+              btnHTML = `<button class="btn-slot" style="opacity:0.5;" disabled>Ocupado</button>`;
+            }
+          } else {
+            // Validar que el usuario no esté en otro slot antes de dejarlo unir
+            if (state.casillaMia) {
+              btnHTML = `<button class="btn-slot" style="opacity:0.5;" disabled>Ya inscrito</button>`;
+            } else {
+              btnHTML = `<button class="btn-slot" onclick="App.abrirPago(${i})">Inscribirse</button>`;
+            }
+          }
+
+          container.innerHTML += `
+            <div class="slot-card">
+              <div>
+                <div class="slot-num">SLOT #${i} ${estadoHTML}</div>
+                <div class="slot-players">${infoText}</div>
+              </div>
+              ${btnHTML}
+            </div>
+          `;
+        }
+      },
+
+      abrirPago(casillaNum) {
+        if (state.casillaMia) return alert("Ya estás inscrito en un slot. No puedes unirte a varios al mismo tiempo.");
+        document.getElementById('input-casilla-num').value = casillaNum;
+        document.getElementById('yape_nro_op').value = '';
+        Views.mostrar('view-form-casilla');
+      },
+
+      async procesarInscripcion(e) {
+        e.preventDefault();
+        const casillaNum = parseInt(document.getElementById('input-casilla-num').value);
+        const nroOp = document.getElementById('yape_nro_op').value.trim();
+
+        const payload = {
+          numero_casilla: casillaNum,
+          j1_apodo: state.perfilActual.nickname,
+          j1_id: state.perfilActual.id_freefire,
+          j1_wsp: state.perfilActual.whatsapp,
+          j1_nro_operacion: nroOp,
+          j1_pago_confirmado: false
+        };
+
+        const { error } = await db.from('inscripciones').insert([payload]);
+        if (error) return alert("Error al registrarse: " + error.message);
+        
+        alert("¡Inscripción en espera enviada! El administrador revisará tu pago a nombre de Sebas.");
+        this.cargarSlotsYEdo();
+      },
+
+      async salirDeSlot(id) {
+        if (confirm("¿Deseas abandonar tu slot y dejarlo libre?")) {
+          await db.from('inscripciones').delete().eq('id', id);
+          this.cargarSlotsYEdo();
+        }
+      },
+
+      apurarAdmin() {
+        alert("🔔 ¡Aviso enviado! Se ha notificado al administrador que tu slot está a la espera de confirmación.");
+      },
+
+      async cerrarSesion() {
+        await db.auth.signOut();
+        window.location.reload();
+      }
+    };
+  })();
+
+  document.addEventListener('DOMContentLoaded', () => App.init());
+</script>
+</body>
+</html>
