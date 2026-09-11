@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Torneo Free Fire - Duos</title>
+  <title>Torneo Free Fire - 1v1</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Rajdhani:wght@500;600;700&display=swap');
@@ -126,18 +126,18 @@
 
   <!-- VISTA 0: AUTENTICACIÓN SOCIAL -->
   <div id="view-auth">
-    <h1>Torneo Free Fire - Duos</h1>
-    <p class="subtitle">Inicia sesión con tu cuenta para registrar tu pareja</p>
+    <h1>Torneo Free Fire - 1v1</h1>
+    <p class="subtitle">Inicia sesión para entrar al enfrentamiento</p>
     <button class="btn-google" onclick="App.loginSocial('google')">Continuar con Google</button>
     <button class="btn-facebook" onclick="App.loginSocial('facebook')">Continuar con Facebook</button>
   </div>
 
-  <!-- VISTA 1: CREAR / EDITAR PERFIL CAPITÁN -->
+  <!-- VISTA 1: CREAR / EDITAR PERFIL JUGADOR -->
   <div id="view-profile" class="hidden">
-    <h2 style="font-family:'Teko'; text-align:center; font-size:28px; margin:0 0 10px;">Ficha del Capitán (Jugador 1)</h2>
-    <p class="subtitle">Tus datos principales</p>
+    <h2 style="font-family:'Teko'; text-align:center; font-size:28px; margin:0 0 10px;">Ficha del Jugador</h2>
+    <p class="subtitle">Tus datos en el juego</p>
     <form id="form-perfil" onsubmit="App.guardarPerfil(event)">
-      <label>TUS APODOS / NICKNAME</label>
+      <label>TU NICKNAME</label>
       <input type="text" id="prof_nickname" required placeholder="Ej: Shadow99">
       <label>TU ID DE FREE FIRE</label>
       <input type="text" id="prof_id" required placeholder="Ej: 987654321">
@@ -148,12 +148,12 @@
     <button id="btn-cancel-profile" class="btn-sec hidden" onclick="App.mostrarSlots()">Volver</button>
   </div>
 
-  <!-- VISTA 2: LISTA DE ESPERA (10 SLOTS DUOS) -->
+  <!-- VISTA 2: LISTA DE ENFRENTAMIENTOS 1V1 -->
   <div id="view-slots" class="hidden">
-    <h1>Duos en Lista de Espera</h1>
+    <h1>Enfrentamientos 1v1</h1>
     
     <div class="user-bar">
-      <span>Capitán: <b id="user-nickname-display">-</b></span>
+      <span>Jugador: <b id="user-nickname-display">-</b></span>
       <div>
         <button class="btn-small" onclick="App.abrirFormularioEditar()" style="background:#2d3748;">✏️ Perfil</button>
         <button class="btn-small" onclick="App.cerrarSesion()" style="background:#1a202c;">Salir</button>
@@ -170,13 +170,13 @@
       <button onclick="App.apurarAdmin()" style="background:#ffb703; color:#000; font-size:16px; padding:8px;">🔔 Recordar / Apurar Administrador</button>
     </div>
 
-    <p class="subtitle">Selecciona un slot libre para registrar tu Dúo.</p>
-    <div id="slots-container" class="slots-grid">Cargando slots...</div>
+    <p class="subtitle">Elige un slot libre (Jugador 1) o un slot con un contrincante esperando (Jugador 2).</p>
+    <div id="slots-container" class="slots-grid">Cargando enfrentamientos...</div>
   </div>
 
-  <!-- VISTA 3: PAGO YAPE Y DATOS DUO -->
+  <!-- VISTA 3: PAGO YAPE Y REGISTRO 1V1 -->
   <div id="view-form-casilla" class="hidden">
-    <h2 style="font-family:'Teko'; text-align:center; font-size:28px; margin:0 0 10px;">Inscripción de Duo</h2>
+    <h2 id="titulo-modo-1v1" style="font-family:'Teko'; text-align:center; font-size:28px; margin:0 0 10px;">Inscripción 1v1</h2>
     
     <div class="yape-box">
       <div class="yape-title">YAPE A NOMBRE DE: SEBAS</div>
@@ -185,25 +185,13 @@
 
     <form id="form-casilla-accion" onsubmit="App.procesarInscripcion(event)">
       <input type="hidden" id="input-casilla-num">
+      <input type="hidden" id="input-rol-jugador"> <!-- 'j1' o 'j2' -->
       
-      <div class="section-divider">DATOS JUGADOR 1 (TÚ)</div>
-      <label>NICKNAME J1</label>
-      <input type="text" id="j1_apodo_input" readonly style="background:#1a1124; color:#d68bff;">
-      <label>ID FREE FIRE J1</label>
-      <input type="text" id="j1_id_input" readonly style="background:#1a1124; color:#d68bff;">
+      <div id="info-registro-1v1"></div>
 
-      <div class="section-divider">DATOS DE TU COMPAÑERO (JUGADOR 2)</div>
-      <label>NICKNAME JUGADOR 2</label>
-      <input type="text" id="j2_apodo" required placeholder="Ej: Viper77">
-      <label>ID DE FREE FIRE JUGADOR 2</label>
-      <input type="text" id="j2_id" required placeholder="Ej: 123456789">
-      <label>WHATSAPP DE TU COMPAÑERO</label>
-      <input type="text" id="j2_wsp" required placeholder="Ej: 987654321">
-
-      <div class="section-divider">PAGO</div>
       <label>CÓDIGO DE OPERACIÓN YAPE</label>
       <input type="text" id="yape_nro_op" required placeholder="Ej: 0548921">
-      <button type="submit">ENVIAR INSCRIPCIÓN DUO</button>
+      <button type="submit">CONFIRMAR INSCRIPCIÓN 1V1</button>
     </form>
     <button class="btn-sec" onclick="App.mostrarSlots()">Volver atrás</button>
   </div>
@@ -298,12 +286,15 @@
 
         const { data: inscripciones } = await db.from('inscripciones').select('*');
         
-        state.casillaMia = inscripciones ? inscripciones.find(i => i.j1_apodo === state.perfilActual.nickname) : null;
+        // Comprobar si el usuario actual está en J1 o J2 en alguna casilla
+        state.casillaMia = inscripciones ? inscripciones.find(i => i.j1_apodo === state.perfilActual.nickname || i.j2_apodo === state.perfilActual.nickname) : null;
 
         const roomContainer = document.getElementById('room-container');
         const waitingActions = document.getElementById('waiting-actions');
 
-        if (state.casillaMia && state.casillaMia.j1_pago_confirmado) {
+        const estoyConfirmado = state.casillaMia && ((state.casillaMia.j1_apodo === state.perfilActual.nickname && state.casillaMia.j1_pago_confirmado) || (state.casillaMia.j2_apodo === state.perfilActual.nickname && state.casillaMia.j2_pago_confirmado));
+
+        if (state.casillaMia && state.casillaMia.j1_pago_confirmado && state.casillaMia.j2_pago_confirmado) {
           roomContainer.classList.remove('hidden');
           waitingActions.classList.add('hidden');
           document.getElementById('room-details').innerHTML = `Sala ID: <b>${config.room_id}</b> | Contraseña: <b>${config.room_pass}</b>`;
@@ -320,33 +311,42 @@
 
         for (let i = 1; i <= TOTAL_SLOTS; i++) {
           const reg = inscripciones ? inscripciones.find(item => item.numero_casilla === i) : null;
-          let estadoHTML = '<span style="color:#00f2fe;">[Libre]</span>';
+          let estadoHTML = '<span style="color:#00f2fe;">[Vacío]</span>';
           let btnHTML = '';
-          let infoText = '<i>Slot vacío (Duo disponible)</i>';
+          let infoText = '<i>Nadie inscrito aún</i>';
 
           if (reg) {
-            const esMio = reg.j1_apodo === state.perfilActual.nickname;
-            const confirmado = reg.j1_pago_confirmado;
-            estadoHTML = confirmado ? '<span style="color:var(--success);">[Confirmado]</span>' : '<span style="color:#ffb703;">[Pendiente]</span>';
-            infoText = `J1: <b>${reg.j1_apodo}</b> (${reg.j1_id})<br>J2: <b>${reg.j2_apodo || 'Compañero'}</b> (${reg.j2_id || '-'})`;
-
-            if (esMio) {
-              btnHTML = `<button class="btn-slot" style="background:#d9534f;" onclick="App.salirDeSlot(${reg.id})">Cancelar</button>`;
+            const esJ1 = reg.j1_apodo === state.perfilActual.nickname;
+            const esJ2 = reg.j2_apodo === state.perfilActual.nickname;
+            const completo = reg.j1_apodo && reg.j2_apodo;
+            
+            if (completo) {
+              estadoHTML = (reg.j1_pago_confirmado && reg.j2_pago_confirmado) ? '<span style="color:var(--success);">[Completo/Confirmado]</span>' : '<span style="color:#ffb703;">[Completo/Pendiente Pago]</span>';
             } else {
-              btnHTML = `<button class="btn-slot" style="opacity:0.5;" disabled>Ocupado</button>`;
+              estadoHTML = '<span style="color:#ffb703;">[Falta Oponente 1v1]</span>';
+            }
+
+            infoText = `⚔️ <b>${reg.j1_apodo || 'Esperando...'}</b> vs <b>${reg.j2_apodo || 'Esperando rival...'}</b>`;
+
+            if (esJ1 || esJ2) {
+              btnHTML = `<button class="btn-slot" style="background:#d9534f;" onclick="App.salirDeSlot(${reg.id})">Abandonar</button>`;
+            } else if (!reg.j2_apodo) {
+              btnHTML = `<button class="btn-slot" style="background:#7928ca;" onclick="App.unirseComoJ2(${reg.id})">Entrar 1v1</button>`;
+            } else {
+              btnHTML = `<button class="btn-slot" style="opacity:0.5;" disabled>Llena</button>`;
             }
           } else {
             if (state.casillaMia) {
               btnHTML = `<button class="btn-slot" style="opacity:0.5;" disabled>Ya inscrito</button>`;
             } else {
-              btnHTML = `<button class="btn-slot" onclick="App.abrirPago(${i})">Inscribir Dúo</button>`;
+              btnHTML = `<button class="btn-slot" onclick="App.iniciarComoJ1(${i})">Crear 1v1 (J1)</button>`;
             }
           }
 
           container.innerHTML += `
             <div class="slot-card">
               <div>
-                <div class="slot-num">SLOT DUO #${i} ${estadoHTML}</div>
+                <div class="slot-num">DUELO #${i} ${estadoHTML}</div>
                 <div class="slot-players">${infoText}</div>
               </div>
               ${btnHTML}
@@ -355,50 +355,94 @@
         }
       },
 
-      abrirPago(casillaNum) {
-        if (state.casillaMia) return alert("Ya estás inscrito en un slot.");
+      iniciarComoJ1(casillaNum) {
+        if (state.casillaMia) return alert("Ya estás inscrito en un duelo.");
         document.getElementById('input-casilla-num').value = casillaNum;
-        document.getElementById('j1_apodo_input').value = state.perfilActual.nickname;
-        document.getElementById('j1_id_input').value = state.perfilActual.id_freefire;
-        document.getElementById('j2_apodo').value = '';
-        document.getElementById('j2_id').value = '';
-        document.getElementById('j2_wsp').value = '';
+        document.getElementById('input-rol-jugador').value = 'j1';
+        document.getElementById('titulo-modo-1v1').innerText = `Inscribirse como J1 (Duelo #${casillaNum})`;
+        document.getElementById('info-registro-1v1').innerHTML = `
+          <p style="color:var(--subtext); margin-bottom:10px;">Serás el <b>Jugador 1</b> de este duelo. Espera a que un rival se una a tu casilla.</p>
+          <div style="background:#13091c; padding:10px; border-radius:8px; margin-bottom:10px;">
+            <div>Tus Datos: <b>${state.perfilActual.nickname}</b> (ID: ${state.perfilActual.id_freefire})</div>
+          </div>
+        `;
+        document.getElementById('yape_nro_op').value = '';
+        Views.mostrar('view-form-casilla');
+      },
+
+      unirseComoJ2(slotId) {
+        if (state.casillaMia) return alert("Ya estás inscrito en un duelo.");
+        document.getElementById('input-casilla-num').value = slotId;
+        document.getElementById('input-rol-jugador').value = 'j2';
+        document.getElementById('titulo-modo-1v1').innerText = `Unirse al Duelo 1v1 como Oponente`;
+        document.getElementById('info-registro-1v1').innerHTML = `
+          <p style="color:var(--subtext); margin-bottom:10px;">Entrarás como el <b>Jugador 2 (Rival)</b> en este enfrentamiento.</p>
+          <div style="background:#13091c; padding:10px; border-radius:8px; margin-bottom:10px;">
+            <div>Tus Datos: <b>${state.perfilActual.nickname}</b> (ID: ${state.perfilActual.id_freefire})</div>
+          </div>
+        `;
         document.getElementById('yape_nro_op').value = '';
         Views.mostrar('view-form-casilla');
       },
 
       async procesarInscripcion(e) {
         e.preventDefault();
-        const casillaNum = parseInt(document.getElementById('input-casilla-num').value);
-        
-        const payload = {
-          numero_casilla: casillaNum,
-          j1_apodo: state.perfilActual.nickname,
-          j1_id: state.perfilActual.id_freefire,
-          j1_wsp: state.perfilActual.whatsapp,
-          j2_apodo: document.getElementById('j2_apodo').value.trim(),
-          j2_id: document.getElementById('j2_id').value.trim(),
-          j2_wsp: document.getElementById('j2_wsp').value.trim(),
-          j1_nro_operacion: document.getElementById('yape_nro_op').value.trim(),
-          j1_pago_confirmado: false
-        };
+        const casillaIdOrNum = document.getElementById('input-casilla-num').value;
+        const rol = document.getElementById('input-rol-jugador').value;
+        const nroOp = document.getElementById('yape_nro_op').value.trim();
 
-        const { error } = await db.from('inscripciones').insert([payload]);
-        if (error) return alert("Error al registrarse: " + error.message);
+        if (rol === 'j1') {
+          const payload = {
+            numero_casilla: parseInt(casillaIdOrNum),
+            j1_apodo: state.perfilActual.nickname,
+            j1_id: state.perfilActual.id_freefire,
+            j1_wsp: state.perfilActual.whatsapp,
+            j1_nro_operacion: nroOp,
+            j1_pago_confirmado: false
+          };
+          const { error } = await db.from('inscripciones').insert([payload]);
+          if (error) return alert("Error: " + error.message);
+        } else {
+          const payload = {
+            j2_apodo: state.perfilActual.nickname,
+            j2_id: state.perfilActual.id_freefire,
+            j2_wsp: state.perfilActual.whatsapp,
+            j2_nro_operacion: nroOp,
+            j2_pago_confirmado: false
+          };
+          const { error } = await db.from('inscripciones').update(payload).eq('id', parseInt(casillaIdOrNum));
+          if (error) return alert("Error: " + error.message);
+        }
         
-        alert("¡Inscripción de Dúo enviada con éxito! Espera la confirmación del administrador.");
+        alert("¡Inscripción 1v1 registrada! Espera la validación del administrador.");
         this.cargarSlotsYEdo();
       },
 
       async salirDeSlot(id) {
-        if (confirm("¿Deseas cancelar la inscripción de tu dúo y liberar el slot?")) {
-          await db.from('inscripciones').delete().eq('id', id);
+        if (confirm("¿Deseas salir de este enfrentamiento 1v1?")) {
+          const reg = await db.from('inscripciones').select('*').eq('id', id).single();
+          if (reg.data) {
+            const esJ1 = reg.data.j1_apodo === state.perfilActual.nickname;
+            if (esJ1) {
+              // Si J1 se va, se borra toda la casilla
+              await db.from('inscripciones').delete().eq('id', id);
+            } else {
+              // Si J2 se va, solo se limpian sus datos para que otro pueda unirse
+              await db.from('inscripciones').update({
+                j2_apodo: null,
+                j2_id: null,
+                j2_wsp: null,
+                j2_nro_operacion: null,
+                j2_pago_confirmado: false
+              }).eq('id', id);
+            }
+          }
           this.cargarSlotsYEdo();
         }
       },
 
       apurarAdmin() {
-        alert("🔔 ¡Aviso enviado! Se ha notificado al administrador.");
+        alert("🔔 ¡Aviso enviado al administrador!");
       },
 
       async cerrarSesion() {
