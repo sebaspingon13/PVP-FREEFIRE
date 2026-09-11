@@ -77,6 +77,7 @@
       color: white; border-radius: 10px; font-family: 'Rajdhani', sans-serif;
     }
     input:focus { outline: none; border-color: var(--primary); }
+    input:disabled { opacity: 0.6; cursor: not-allowed; }
 
     button {
       width: 100%; padding: 12px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
@@ -106,12 +107,6 @@
     .slot-num { font-family: 'Teko', sans-serif; font-size: 20px; color: #fff; }
     .slot-players { font-size: 13px; color: var(--subtext); line-height: 1.3; }
     .btn-slot { width: auto; padding: 6px 14px; font-size: 15px; }
-
-    .room-info-card {
-      background: rgba(0, 242, 195, 0.1);
-      border: 1px solid var(--success);
-      padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: center;
-    }
 
     .hidden { display: none !important; }
   </style>
@@ -156,12 +151,6 @@
       </div>
     </div>
 
-    <!-- Sala en vivo si estás inscrito y confirmado en un duelo -->
-    <div id="room-container" class="hidden room-info-card">
-      <h3 style="margin:0 0 5px; color:var(--success); font-family:'Teko'; font-size:22px;">¡DUELO CONFIRMADO!</h3>
-      <p id="room-details" style="margin:0; font-size:16px; font-weight:bold;"></p>
-    </div>
-
     <div id="waiting-actions" class="hidden" style="margin-bottom:15px; text-align:center;">
       <button onclick="App.apurarAdmin()" style="background:#ffb703; color:#000; font-size:16px; padding:8px;">🔔 Recordar / Apurar Administrador</button>
     </div>
@@ -181,7 +170,7 @@
 
     <form id="form-casilla-accion" onsubmit="App.procesarInscripcion(event)">
       <input type="hidden" id="input-casilla-id">
-      <input type="hidden" id="input-accion-tipo"> <!-- 'crear_j1' o 'unirse_j2' -->
+      <input type="hidden" id="input-accion-tipo">
       <input type="hidden" id="input-casilla-num">
 
       <label>CÓDIGO DE OPERACIÓN YAPE</label>
@@ -200,7 +189,7 @@
   const App = (() => {
     const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     const TOTAL_DUELOS = 10;
-    let state = { usuarioActual: null, perfilActual: null, configuracionSala: null };
+    let state = { usuarioActual: null, perfilActual: null, duelosCache: [] };
 
     const Views = {
       ocultarTodas() {
@@ -228,12 +217,6 @@
             if (state.usuarioActual) this.cargarDuelos();
           })
           .subscribe();
-
-        db.channel('public:configuracion_admin')
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'configuracion_admin' }, () => {
-            if (state.usuarioActual) this.cargarDuelos();
-          })
-          .subscribe();
       },
 
       async loginSocial(provider) {
@@ -247,12 +230,28 @@
           document.getElementById('user-nickname-display').innerText = data.nickname;
           this.cargarDuelos();
         } else {
+          document.getElementById('btn-cancel-profile').classList.add('hidden');
           Views.mostrar('view-profile');
         }
       },
 
-      abrirFormularioEditar() {
-        document.getElementById('prof_nickname').value = state.perfilActual.nickname || '';
+      async abrirFormularioEditar() {
+        const { data: duelos } = await db.from('inscripciones').select('*');
+        const nicknameActual = state.perfilActual.nickname;
+        const miDuelo = duelos ? duelos.find(d => d.j1_apodo === nicknameActual || d.j2_apodo === nicknameActual) : null;
+
+        const inputNick = document.getElementById('prof_nickname');
+        inputNick.value = state.perfilActual.nickname || '';
+        
+        // Bloquear edición de nombre si ya está en un slot
+        if (miDuelo) {
+          inputNick.disabled = true;
+          inputNick.title = "No puedes cambiar tu apodo mientras estés inscrito en un duelo.";
+        } else {
+          inputNick.disabled = false;
+          inputNick.title = "";
+        }
+
         document.getElementById('prof_id').value = state.perfilActual.id_freefire || '';
         document.getElementById('prof_wsp').value = state.perfilActual.whatsapp || '';
         document.getElementById('btn-cancel-profile').classList.remove('hidden');
@@ -261,9 +260,12 @@
 
       async guardarPerfil(e) {
         e.preventDefault();
+        const inputNick = document.getElementById('prof_nickname');
+        const nuevoNickname = inputNick.disabled ? state.perfilActual.nickname : inputNick.value.trim();
+
         const payload = {
           id: state.usuarioActual.id,
-          nickname: document.getElementById('prof_nickname').value.trim(),
+          nickname: nuevoNickname,
           id_freefire: document.getElementById('prof_id').value.trim(),
           whatsapp: document.getElementById('prof_wsp').value.trim()
         };
@@ -276,26 +278,16 @@
       async cargarDuelos() {
         Views.mostrar('view-slots');
         
-        const { data: config } = await db.from('configuracion_admin').select('*').eq('id', 1).maybeSingle();
-        state.configuracionSala = config;
-
         const { data: duelos } = await db.from('inscripciones').select('*');
+        state.duelosCache = duelos || [];
         
         const nicknameActual = state.perfilActual.nickname;
-        const miDuelo = duelos ? duelos.find(d => d.j1_apodo === nicknameActual || d.j2_apodo === nicknameActual) : null;
+        const miDuelo = state.duelosCache.find(d => d.j1_apodo === nicknameActual || d.j2_apodo === nicknameActual);
 
-        const roomContainer = document.getElementById('room-container');
         const waitingActions = document.getElementById('waiting-actions');
-
-        if (miDuelo && miDuelo.j1_pago_confirmado && miDuelo.j2_pago_confirmado) {
-          roomContainer.classList.remove('hidden');
-          waitingActions.classList.add('hidden');
-          document.getElementById('room-details').innerHTML = `Sala ID: <b>${config.room_id}</b> | Contraseña: <b>${config.room_pass}</b>`;
-        } else if (miDuelo) {
-          roomContainer.classList.add('hidden');
+        if (miDuelo && (!miDuelo.j1_pago_confirmado || (miDuelo.j2_apodo && !miDuelo.j2_pago_confirmado))) {
           waitingActions.classList.remove('hidden');
         } else {
-          roomContainer.classList.add('hidden');
           waitingActions.classList.add('hidden');
         }
 
@@ -303,10 +295,11 @@
         container.innerHTML = '';
 
         for (let i = 1; i <= TOTAL_DUELOS; i++) {
-          const reg = duelos ? duelos.find(item => item.numero_casilla === i) : null;
+          const reg = state.duelosCache.find(item => item.numero_casilla === i);
           let estadoHTML = '<span style="color:#00f2fe;">[Disponible]</span>';
           let btnHTML = '';
           let infoText = '<i>Crea un nuevo duelo</i>';
+          let credencialesHTML = '';
 
           if (reg) {
             const esJ1 = reg.j1_apodo === nicknameActual;
@@ -320,6 +313,17 @@
             }
 
             infoText = `⚔️ <b>${reg.j1_apodo}</b> vs <b>${reg.j2_apodo || 'Esperando oponente...'}</b>`;
+
+            // Mostrar ID y Contraseña de sala independientes al costado si el usuario pertenece a esta sala
+            if (esJ1 || esJ2) {
+              const roomId = reg.room_id || 'Por definir';
+              const roomPass = reg.room_pass || 'Por definir';
+              credencialesHTML = `
+                <div style="margin-top: 6px; background: rgba(0,242,195,0.08); border: 1px dashed var(--success); padding: 6px 8px; border-radius: 6px; font-size: 12px;">
+                  🔑 Sala ID: <b>${roomId}</b> | Pass: <b>${roomPass}</b>
+                </div>
+              `;
+            }
 
             if (esJ1 || esJ2) {
               btnHTML = `<button class="btn-slot" style="background:#d9534f;" onclick="App.salirDuelo(${reg.id}, '${esJ1 ? 'j1' : 'j2'}', ${completo})">Abandonar</button>`;
@@ -338,11 +342,12 @@
 
           container.innerHTML += `
             <div class="slot-card">
-              <div>
+              <div style="flex-grow: 1; padding-right: 10px;">
                 <div class="slot-num">DUELO #${i} ${estadoHTML}</div>
                 <div class="slot-players">${infoText}</div>
+                ${credencialesHTML}
               </div>
-              ${btnHTML}
+              <div>${btnHTML}</div>
             </div>
           `;
         }
@@ -381,7 +386,9 @@
             j1_id: id_ff,
             j1_wsp: wsp,
             j1_nro_operacion: nroOp,
-            j1_pago_confirmado: false
+            j1_pago_confirmado: false,
+            room_id: 'Por definir',
+            room_pass: 'Por definir'
           };
           const { error } = await db.from('inscripciones').insert([payload]);
           if (error) return alert("Error al crear duelo: " + error.message);
@@ -405,10 +412,8 @@
       async salirDuelo(id, rol, completo) {
         if (confirm("¿Estás seguro de abandonar este duelo?")) {
           if (rol === 'j1' || !completo) {
-            // Si J1 se va o el duelo estaba incompleto, se borra toda la fila para liberar el slot completo
             await db.from('inscripciones').delete().eq('id', id);
           } else {
-            // Si J2 se va y el duelo ya estaba completo, solo se remueve a J2 para que otro random pueda entrar
             await db.from('inscripciones').update({
               j2_apodo: null,
               j2_id: null,
@@ -428,6 +433,11 @@
       async cerrarSesion() {
         await db.auth.signOut();
         window.location.reload();
+      },
+
+      mostrarSlots() {
+        Views.mostrar('view-slots');
+        this.cargarDuelos();
       }
     };
   })();
