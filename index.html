@@ -1,472 +1,1326 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Torneo Free Fire - PVP Randoms</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Rajdhani:wght@500;600;700&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    :root {
-      --bg: #050308;
-      --card-bg: rgba(16, 10, 24, 0.92);
-      --primary: #b537f2;
-      --primary-light: #d68bff;
-      --primary-dark: #6d1b9e;
-      --yape: #742284;
-      --yape-light: #a32dbb;
-      --text: #ffffff;
-      --subtext: #a99cc2;
-      --border: rgba(181, 55, 242, 0.18);
-      --success: #00f2c3;
-    }
+<title>Torneo Free Fire - PVP Randoms</title>
 
-    * { box-sizing: border-box; }
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    body {
-      margin: 0;
-      font-family: 'Rajdhani', sans-serif;
-      background: radial-gradient(circle at top, #170c22 0%, #020103 70%);
-      color: var(--text);
-      display: flex;
-      justify-content: center;
-      padding: 20px 15px;
-      min-height: 100vh;
-    }
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Rajdhani:wght@500;600;700&display=swap');
 
-    .container {
-      width: 100%;
-      max-width: 620px;
-      background: var(--card-bg);
-      backdrop-filter: blur(16px);
-      padding: 26px;
-      border-radius: 20px;
-      border: 1px solid rgba(181, 55, 242, 0.35);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85);
-      position: relative;
-    }
+:root {
+    --bg:#050308;
+    --card-bg:rgba(16,10,24,.92);
+    --primary:#b537f2;
+    --primary-light:#d68bff;
+    --primary-dark:#6d1b9e;
+    --text:#fff;
+    --subtext:#a99cc2;
+    --border:rgba(181,55,242,.18);
+    --success:#00f2c3;
+}
 
-    h1 {
-      font-family: 'Teko', sans-serif;
-      text-align: center;
-      color: var(--primary-light);
-      font-size: 40px;
-      margin: 0;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
+* {
+    box-sizing:border-box;
+}
 
-    .subtitle { text-align: center; color: var(--subtext); font-size: 13px; margin-bottom: 20px; }
+body {
+    margin:0;
+    font-family:'Rajdhani',sans-serif;
+    background:radial-gradient(circle at top,#170c22 0%,#020103 70%);
+    color:var(--text);
+    display:flex;
+    justify-content:center;
+    padding:20px 15px;
+    min-height:100vh;
+}
 
-    .user-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(181, 55, 242, 0.12);
-      padding: 10px 14px;
-      border-radius: 10px;
-      margin-bottom: 15px;
-      border: 1px solid var(--border);
-    }
+.container {
+    width:100%;
+    max-width:620px;
+    background:var(--card-bg);
+    backdrop-filter:blur(16px);
+    padding:26px;
+    border-radius:20px;
+    border:1px solid rgba(181,55,242,.35);
+    box-shadow:0 20px 60px rgba(0,0,0,.85);
+}
 
-    label { display: block; margin-bottom: 4px; font-size: 11px; color: var(--subtext); font-weight: 700; }
-    input {
-      width: 100%; padding: 10px; margin-bottom: 10px;
-      background: rgba(5, 3, 8, 0.85); border: 1px solid var(--border);
-      color: white; border-radius: 10px; font-family: 'Rajdhani', sans-serif;
-    }
-    input:focus { outline: none; border-color: var(--primary); }
-    input:disabled { opacity: 0.6; cursor: not-allowed; }
+h1 {
+    font-family:'Teko',sans-serif;
+    text-align:center;
+    color:var(--primary-light);
+    font-size:40px;
+    margin:0;
+    letter-spacing:2px;
+    text-transform:uppercase;
+}
 
-    button {
-      width: 100%; padding: 12px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-      border: none; color: white; font-family: 'Teko', sans-serif; font-size: 20px;
-      border-radius: 10px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
-    }
+.subtitle {
+    text-align:center;
+    color:var(--subtext);
+    font-size:13px;
+    margin-bottom:20px;
+}
 
-    .btn-google { background: #ea4335; margin-bottom: 10px; }
-    .btn-facebook { background: #1877f2; margin-bottom: 10px; }
-    .btn-sec { background: transparent; border: 1px solid var(--border); color: var(--subtext); margin-top: 10px; font-size: 16px; }
-    .btn-small { width: auto; padding: 4px 10px; font-size: 14px; border-radius: 6px; }
+.user-bar {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:rgba(181,55,242,.12);
+    padding:10px 14px;
+    border-radius:10px;
+    margin-bottom:15px;
+    border:1px solid var(--border);
+}
 
-    .yape-box {
-      background: rgba(116, 34, 132, 0.4);
-      border: 1px solid var(--yape-light);
-      border-radius: 14px; padding: 18px; text-align: center; margin-bottom: 15px;
-    }
-    .yape-title { color: #d175ed; font-family: 'Teko', sans-serif; font-size: 24px; margin: 0; }
-    .yape-number { font-size: 26px; font-weight: 700; color: #fff; margin: 6px 0; }
+label {
+    display:block;
+    margin-bottom:4px;
+    font-size:11px;
+    color:var(--subtext);
+    font-weight:700;
+}
 
-    .slots-grid { display: flex; flex-direction: column; gap: 10px; max-height: 50vh; overflow-y: auto; padding-right: 4px; }
-    .slot-card {
-      background: rgba(20, 10, 30, 0.85);
-      border: 1px solid var(--border);
-      border-radius: 10px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center;
-    }
-    .slot-num { font-family: 'Teko', sans-serif; font-size: 20px; color: #fff; }
-    .slot-players { font-size: 13px; color: var(--subtext); line-height: 1.3; }
-    .btn-slot { width: auto; padding: 6px 14px; font-size: 15px; }
+input {
+    width:100%;
+    padding:10px;
+    margin-bottom:10px;
+    background:rgba(5,3,8,.85);
+    border:1px solid var(--border);
+    color:white;
+    border-radius:10px;
+    font-family:'Rajdhani',sans-serif;
+}
 
-    .hidden { display: none !important; }
-  </style>
+input:focus {
+    outline:none;
+    border-color:var(--primary);
+}
+
+button {
+    width:100%;
+    padding:12px;
+    background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+    border:none;
+    color:white;
+    font-family:'Teko',sans-serif;
+    font-size:20px;
+    border-radius:10px;
+    cursor:pointer;
+    text-transform:uppercase;
+}
+
+button:disabled {
+    opacity:.5;
+    cursor:not-allowed;
+}
+
+.btn-google {
+    background:#ea4335;
+    margin-bottom:10px;
+}
+
+.btn-facebook {
+    background:#1877f2;
+    margin-bottom:10px;
+}
+
+.btn-sec {
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--subtext);
+    margin-top:10px;
+    font-size:16px;
+}
+
+.btn-small {
+    width:auto;
+    padding:4px 10px;
+    font-size:14px;
+    border-radius:6px;
+}
+
+.yape-box {
+    background:rgba(116,34,132,.4);
+    border:1px solid #a32dbb;
+    border-radius:14px;
+    padding:18px;
+    text-align:center;
+    margin-bottom:15px;
+}
+
+.yape-title {
+    color:#d175ed;
+    font-family:'Teko',sans-serif;
+    font-size:24px;
+}
+
+.yape-number {
+    font-size:26px;
+    font-weight:700;
+    color:#fff;
+    margin:6px 0;
+}
+
+.slots-grid {
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    max-height:60vh;
+    overflow-y:auto;
+    padding-right:4px;
+}
+
+.slot-card {
+    background:rgba(20,10,30,.85);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:12px 14px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+}
+
+.slot-num {
+    font-family:'Teko',sans-serif;
+    font-size:20px;
+}
+
+.slot-players {
+    font-size:13px;
+    color:var(--subtext);
+    line-height:1.3;
+}
+
+.btn-slot {
+    width:auto;
+    padding:6px 14px;
+    font-size:15px;
+}
+
+.room-box {
+    margin-top:7px;
+    background:rgba(0,242,195,.08);
+    border:1px dashed var(--success);
+    padding:7px 9px;
+    border-radius:6px;
+    font-size:12px;
+}
+
+.hidden {
+    display:none!important;
+}
+</style>
 </head>
+
 <body>
 
 <div class="container">
 
-  <!-- VISTA 0: AUTENTICACIÓN SOCIAL -->
-  <div id="view-auth">
-    <h1>PVP Free Fire - 1v1</h1>
-    <p class="subtitle">Inicia sesión para entrar a los duelos</p>
-    <button class="btn-google" onclick="App.loginSocial('google')">Continuar con Google</button>
-    <button class="btn-facebook" onclick="App.loginSocial('facebook')">Continuar con Facebook</button>
-  </div>
+<!-- LOGIN -->
+<div id="view-auth">
 
-  <!-- VISTA 1: CREAR / EDITAR PERFIL PERSONAL -->
-  <div id="view-profile" class="hidden">
-    <h2 style="font-family:'Teko'; text-align:center; font-size:28px; margin:0 0 10px;">Tu Ficha de Jugador</h2>
-    <p class="subtitle">Ingresa tus datos personales para el torneo</p>
-    <form id="form-perfil" onsubmit="App.guardarPerfil(event)">
-      <label>TUS APODOS / NICKNAME</label>
-      <input type="text" id="prof_nickname" required placeholder="Ej: Shadow99">
-      <label>TU ID DE FREE FIRE</label>
-      <input type="text" id="prof_id" required placeholder="Ej: 987654321">
-      <label>TU WHATSAPP</label>
-      <input type="text" id="prof_wsp" required placeholder="Ej: 987654321">
-      <button type="submit">GUARDAR Y CONTINUAR</button>
-    </form>
-    <button id="btn-cancel-profile" class="btn-sec hidden" onclick="App.mostrarSlots()">Volver</button>
-  </div>
+<h1>PVP Free Fire - 1v1</h1>
 
-  <!-- VISTA 2: LISTA GENERAL DE DUELOS PVP -->
-  <div id="view-slots" class="hidden">
-    <h1>Duelos PVP (1v1)</h1>
-    
-    <div class="user-bar">
-      <span>Jugador: <b id="user-nickname-display">-</b></span>
-      <div>
-        <button class="btn-small" onclick="App.abrirFormularioEditar()" style="background:#2d3748;">✏️ Perfil</button>
-        <button class="btn-small" onclick="App.cerrarSesion()" style="background:#1a202c;">Salir</button>
-      </div>
-    </div>
+<p class="subtitle">
+Inicia sesión para entrar a los duelos
+</p>
 
-    <div id="waiting-actions" class="hidden" style="margin-bottom:15px; text-align:center;">
-      <button onclick="App.apurarAdmin()" style="background:#ffb703; color:#000; font-size:16px; padding:8px;">🔔 Recordar / Apurar Administrador</button>
-    </div>
+<button class="btn-google"
+onclick="App.loginSocial('google')">
+Continuar con Google
+</button>
 
-    <p class="subtitle">Crea un duelo vacío (serás J1) o únete a un duelo abierto como rival (J2).</p>
-    <div id="slots-container" class="slots-grid">Cargando duelos...</div>
-  </div>
-
-  <!-- VISTA 3: PAGO YAPE Y CONFIRMACIÓN -->
-  <div id="view-form-casilla" class="hidden">
-    <h2 id="titulo-modal-accion" style="font-family:'Teko'; text-align:center; font-size:28px; margin:0 0 10px;">Inscripción Yape</h2>
-    
-    <div class="yape-box">
-      <div class="yape-title">YAPE A NOMBRE DE: SEBAS</div>
-      <div class="yape-number">📱 +51 930 263 051</div>
-    </div>
-
-    <form id="form-casilla-accion" onsubmit="App.procesarInscripcion(event)">
-      <input type="hidden" id="input-casilla-id">
-      <input type="hidden" id="input-accion-tipo">
-      <input type="hidden" id="input-casilla-num">
-
-      <label>CÓDIGO DE OPERACIÓN YAPE</label>
-      <input type="text" id="yape_nro_op" required placeholder="Ej: 0548921">
-      <button type="submit" id="btn-enviar-pago">ENVIAR PAGO Y PARTICIPAR</button>
-    </form>
-    <button class="btn-sec" onclick="App.mostrarSlots()">Volver atrás</button>
-  </div>
+<button class="btn-facebook"
+onclick="App.loginSocial('facebook')">
+Continuar con Facebook
+</button>
 
 </div>
 
+
+<!-- PERFIL -->
+<div id="view-profile" class="hidden">
+
+<h2 style="font-family:'Teko';text-align:center;font-size:28px;">
+Tu Ficha de Jugador
+</h2>
+
+<p class="subtitle">
+Ingresa tus datos personales para el torneo
+</p>
+
+<form id="form-perfil">
+
+<label>TUS APODOS / NICKNAME</label>
+<input id="prof_nickname" required placeholder="Ej: Shadow99">
+
+<label>TU ID DE FREE FIRE</label>
+<input id="prof_id" required placeholder="Ej: 987654321">
+
+<label>TU WHATSAPP</label>
+<input id="prof_wsp" required placeholder="Ej: 987654321">
+
+<button type="submit">
+GUARDAR Y CONTINUAR
+</button>
+
+</form>
+
+<button
+id="btn-cancel-profile"
+class="btn-sec hidden"
+onclick="App.mostrarSlots()">
+Volver
+</button>
+
+</div>
+
+
+<!-- DUELOS -->
+<div id="view-slots" class="hidden">
+
+<h1>Duelos PVP (1v1)</h1>
+
+<div class="user-bar">
+
+<span>
+Jugador:
+<b id="user-nickname-display">-</b>
+</span>
+
+<div>
+
+<button
+class="btn-small"
+onclick="App.abrirFormularioEditar()"
+style="background:#2d3748;">
+✏️ Perfil
+</button>
+
+<button
+class="btn-small"
+onclick="App.cerrarSesion()"
+style="background:#1a202c;">
+Salir
+</button>
+
+</div>
+</div>
+
+<div
+id="waiting-actions"
+class="hidden"
+style="margin-bottom:15px;text-align:center;">
+
+<button
+onclick="App.apurarAdmin()"
+style="background:#ffb703;color:#000;font-size:16px;padding:8px;">
+🔔 Recordar / Apurar Administrador
+</button>
+
+</div>
+
+<p class="subtitle">
+Crea un duelo vacío o únete como rival.
+</p>
+
+<div id="slots-container" class="slots-grid">
+Cargando duelos...
+</div>
+
+</div>
+
+
+<!-- PAGO -->
+<div id="view-form-casilla" class="hidden">
+
+<h2
+id="titulo-modal-accion"
+style="font-family:'Teko';text-align:center;font-size:28px;">
+Inscripción Yape
+</h2>
+
+<div class="yape-box">
+
+<div class="yape-title">
+YAPE A NOMBRE DE: SEBAS
+</div>
+
+<div class="yape-number">
+📱 +51 930 263 051
+</div>
+
+</div>
+
+<form id="form-casilla-accion">
+
+<input type="hidden" id="input-accion-tipo">
+<input type="hidden" id="input-casilla-num">
+<input type="hidden" id="input-inscripcion-id">
+
+<label>
+CÓDIGO DE OPERACIÓN YAPE
+</label>
+
+<input
+type="text"
+id="yape_nro_op"
+required
+placeholder="Ej: 0548921">
+
+<button type="submit" id="btn-enviar-pago">
+ENVIAR PAGO Y PARTICIPAR
+</button>
+
+</form>
+
+<button
+class="btn-sec"
+onclick="App.mostrarSlots()">
+Volver atrás
+</button>
+
+</div>
+
+</div>
+
+
 <script>
-  const SUPABASE_URL = 'https://eaqagfaarjsonclcpahd.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVhcWFnZmFhcmpzb25jbGNwYWhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzODc2NDIsImV4cCI6MjEwMzk2MzY0Mn0.-9b9qzfJ4oZANgQdLTy2vYTMbfj1ffiTEVrQY-QSYPs';
 
-  const App = (() => {
-    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    const TOTAL_DUELOS = 10;
-    let state = { usuarioActual: null, perfilActual: null, duelosCache: [] };
+const SUPABASE_URL =
+'https://eaqagfaarjsonclcpahd.supabase.co';
 
-    const Views = {
-      ocultarTodas() {
-        ['view-auth', 'view-profile', 'view-slots', 'view-form-casilla'].forEach(id => {
-          document.getElementById(id).classList.add('hidden');
-        });
-      },
-      mostrar(id) { this.ocultarTodas(); document.getElementById(id).classList.remove('hidden'); }
-    };
+const SUPABASE_KEY =
+'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFhZ2Fhcmpzb25jbGNwYWhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzODc2NDIsImV4cCI6MjEwMzk2MzY0Mn0.-9b9qzfJ4oZANgQdLTy2vYTMbfj1ffiTEVrQY-QSYPs';
 
-    return {
-      async init() {
-        const { data: { session } } = await db.auth.getSession();
-        if (session) {
-          state.usuarioActual = session.user;
-          await this.cargarPerfil();
-        } else {
-          Views.mostrar('view-auth');
-        }
 
-        db.auth.onAuthStateChange(async (event, session) => {
-          if (session) {
-            state.usuarioActual = session.user;
+const db = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+
+const App = {
+
+    state:{
+        usuario:null,
+        perfil:null,
+        inscripciones:[],
+        salas:[]
+    },
+
+
+    ocultarTodo(){
+
+        [
+            'view-auth',
+            'view-profile',
+            'view-slots',
+            'view-form-casilla'
+        ].forEach(id =>
+            document.getElementById(id).classList.add('hidden')
+        );
+
+    },
+
+
+    mostrar(id){
+
+        this.ocultarTodo();
+
+        document
+            .getElementById(id)
+            .classList.remove('hidden');
+
+    },
+
+
+    async init(){
+
+        const {
+            data:{
+                session
+            }
+        } = await db.auth.getSession();
+
+
+        if(session){
+
+            this.state.usuario = session.user;
+
             await this.cargarPerfil();
-          } else {
-            state.usuarioActual = null;
-            Views.mostrar('view-auth');
-          }
+
+        }else{
+
+            this.mostrar('view-auth');
+
+        }
+
+
+        db.auth.onAuthStateChange(
+            async(event,session)=>{
+
+                if(session && !this.state.usuario){
+
+                    this.state.usuario = session.user;
+
+                    await this.cargarPerfil();
+
+                }
+
+                if(!session){
+
+                    this.state.usuario = null;
+                    this.state.perfil = null;
+
+                    this.mostrar('view-auth');
+
+                }
+
+            }
+        );
+
+
+        db.channel('torneo-publico')
+
+        .on(
+            'postgres_changes',
+            {
+                event:'*',
+                schema:'public',
+                table:'inscripciones'
+            },
+            ()=>{
+                if(this.state.usuario)
+                    this.cargarDuelos();
+            }
+        )
+
+        .on(
+            'postgres_changes',
+            {
+                event:'*',
+                schema:'public',
+                table:'salas'
+            },
+            ()=>{
+                if(this.state.usuario)
+                    this.cargarDuelos();
+            }
+        )
+
+        .subscribe();
+
+    },
+
+
+    async loginSocial(provider){
+
+        const {error} =
+        await db.auth.signInWithOAuth({
+
+            provider,
+
+            options:{
+                redirectTo:window.location.href
+            }
+
         });
 
-        db.channel('public:inscripciones')
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'inscripciones' }, () => {
-            if (state.usuarioActual && state.perfilActual) this.cargarDuelos();
-          })
-          .subscribe();
-      },
+        if(error)
+            alert('Error de inicio de sesión: '+error.message);
 
-      async loginSocial(provider) {
-        await db.auth.signInWithOAuth({ provider, options: { redirectTo: window.location.href } });
-      },
+    },
 
-      async cargarPerfil() {
-        const { data } = await db.from('perfiles').select('*').eq('id', state.usuarioActual.id).maybeSingle();
-        if (data) {
-          state.perfilActual = data;
-          document.getElementById('user-nickname-display').innerText = data.nickname;
-          this.cargarDuelos();
-        } else {
-          document.getElementById('btn-cancel-profile').classList.add('hidden');
-          Views.mostrar('view-profile');
-        }
-      },
 
-      async abrirFormularioEditar() {
-        const { data: duelos } = await db.from('inscripciones').select('*');
-        const nicknameActual = state.perfilActual.nickname;
-        const miDuelo = duelos ? duelos.find(d => d.j1_apodo === nicknameActual || d.j2_apodo === nicknameActual) : null;
+    async cargarPerfil(){
 
-        const inputNick = document.getElementById('prof_nickname');
-        inputNick.value = state.perfilActual.nickname || '';
-        
-        if (miDuelo) {
-          inputNick.disabled = true;
-          inputNick.title = "No puedes cambiar tu apodo mientras estés inscrito en un duelo.";
-        } else {
-          inputNick.disabled = false;
-          inputNick.title = "";
+        if(!this.state.usuario)
+            return;
+
+
+        const {data,error} =
+        await db
+        .from('perfiles')
+        .select('*')
+        .eq('id',this.state.usuario.id)
+        .maybeSingle();
+
+
+        if(error){
+
+            alert('Error cargando perfil: '+error.message);
+            return;
+
         }
 
-        document.getElementById('prof_id').value = state.perfilActual.id_freefire || '';
-        document.getElementById('prof_wsp').value = state.perfilActual.whatsapp || '';
-        document.getElementById('btn-cancel-profile').classList.remove('hidden');
-        Views.mostrar('view-profile');
-      },
 
-      async guardarPerfil(e) {
+        if(data){
+
+            this.state.perfil = data;
+
+            document
+            .getElementById('user-nickname-display')
+            .textContent = data.nickname;
+
+            await this.cargarDuelos();
+
+        }else{
+
+            document
+            .getElementById('btn-cancel-profile')
+            .classList.add('hidden');
+
+            this.mostrar('view-profile');
+
+        }
+
+    },
+
+
+    async abrirFormularioEditar(){
+
+        if(!this.state.perfil)
+            return;
+
+
+        const nickname =
+            this.state.perfil.nickname;
+
+
+        const {data} =
+        await db
+        .from('inscripciones')
+        .select('id,j1_apodo,j2_apodo')
+        .or(
+            `j1_apodo.eq.${nickname},j2_apodo.eq.${nickname}`
+        );
+
+
+        const estaInscrito =
+            data && data.length > 0;
+
+
+        const nickInput =
+        document.getElementById('prof_nickname');
+
+
+        nickInput.value =
+        nickname;
+
+
+        nickInput.disabled =
+        estaInscrito;
+
+
+        document
+        .getElementById('prof_id')
+        .value =
+        this.state.perfil.id_freefire || '';
+
+
+        document
+        .getElementById('prof_wsp')
+        .value =
+        this.state.perfil.whatsapp || '';
+
+
+        document
+        .getElementById('btn-cancel-profile')
+        .classList.remove('hidden');
+
+
+        this.mostrar('view-profile');
+
+    },
+
+
+    async guardarPerfil(e){
+
         e.preventDefault();
-        const inputNick = document.getElementById('prof_nickname');
-        const nuevoNickname = inputNick.disabled ? state.perfilActual.nickname : inputNick.value.trim();
 
-        const payload = {
-          id: state.usuarioActual.id,
-          nickname: nuevoNickname,
-          id_freefire: document.getElementById('prof_id').value.trim(),
-          whatsapp: document.getElementById('prof_wsp').value.trim()
+
+        const nickInput =
+        document.getElementById('prof_nickname');
+
+
+        const nickname =
+        nickInput.disabled
+        ? this.state.perfil.nickname
+        : nickInput.value.trim();
+
+
+        const payload={
+
+            id:this.state.usuario.id,
+
+            nickname,
+
+            id_freefire:
+            document
+            .getElementById('prof_id')
+            .value
+            .trim(),
+
+            whatsapp:
+            document
+            .getElementById('prof_wsp')
+            .value
+            .trim()
+
         };
-        const { error } = await db.from('perfiles').upsert([payload]);
-        if (error) return alert("Error: " + error.message);
-        alert("¡Perfil guardado!");
+
+
+        const {error} =
+        await db
+        .from('perfiles')
+        .upsert(payload);
+
+
+        if(error){
+
+            alert('Error guardando perfil: '+error.message);
+            return;
+
+        }
+
+
         await this.cargarPerfil();
-      },
 
-      async cargarDuelos() {
-        Views.mostrar('view-slots');
-        
-        const { data: duelos } = await db.from('inscripciones').select('*');
-        state.duelosCache = duelos || [];
-        
-        const nicknameActual = state.perfilActual.nickname;
-        const miDuelo = state.duelosCache.find(d => d.j1_apodo === nicknameActual || d.j2_apodo === nicknameActual);
+    },
 
-        const waitingActions = document.getElementById('waiting-actions');
-        if (miDuelo && (!miDuelo.j1_pago_confirmado || (miDuelo.j2_apodo && !miDuelo.j2_pago_confirmado))) {
-          waitingActions.classList.remove('hidden');
-        } else {
-          waitingActions.classList.add('hidden');
+
+    async cargarDuelos(){
+
+        if(!this.state.perfil)
+            return;
+
+
+        this.mostrar('view-slots');
+
+
+        const [
+            inscripcionesResult,
+            salasResult
+        ] = await Promise.all([
+
+            db
+            .from('inscripciones')
+            .select('*'),
+
+            db
+            .from('salas')
+            .select('*')
+            .order('numero_casilla')
+
+        ]);
+
+
+        if(inscripcionesResult.error){
+
+            alert(
+                'Error cargando inscripciones: '+
+                inscripcionesResult.error.message
+            );
+
+            return;
+
         }
 
-        const container = document.getElementById('slots-container');
-        container.innerHTML = '';
 
-        for (let i = 1; i <= TOTAL_DUELOS; i++) {
-          const reg = state.duelosCache.find(item => item.numero_casilla === i);
-          let estadoHTML = '<span style="color:#00f2fe;">[Disponible]</span>';
-          let btnHTML = '';
-          let infoText = '<i>Crea un nuevo duelo</i>';
-          let credencialesHTML = '';
+        if(salasResult.error){
 
-          if (reg) {
-            const esJ1 = reg.j1_apodo === nicknameActual;
-            const esJ2 = reg.j2_apodo === nicknameActual;
-            const completo = reg.j1_apodo && reg.j2_apodo;
-            const ambosPagados = reg.j1_pago_confirmado && reg.j2_pago_confirmado;
+            alert(
+                'Error cargando salas: '+
+                salasResult.error.message
+            );
 
-            if (completo) {
-              estadoHTML = ambosPagados ? '<span style="color:var(--success);">[Duelo Confirmado]</span>' : '<span style="color:#ffb703;">[Esperando Pago de ambos]</span>';
-            } else {
-              estadoHTML = '<span style="color:#ffb703;">[Falta Rival 1v1]</span>';
+            return;
+
+        }
+
+
+        this.state.inscripciones =
+        inscripcionesResult.data || [];
+
+
+        this.state.salas =
+        salasResult.data || [];
+
+
+        const nickname =
+        this.state.perfil.nickname;
+
+
+        const miDuelo =
+        this.state.inscripciones.find(
+            d =>
+            d.j1_apodo === nickname ||
+            d.j2_apodo === nickname
+        );
+
+
+        const waiting =
+        document.getElementById('waiting-actions');
+
+
+        if(
+            miDuelo &&
+            (
+                !miDuelo.j1_pago_confirmado ||
+                (
+                    miDuelo.j2_apodo &&
+                    !miDuelo.j2_pago_confirmado
+                )
+            )
+        ){
+
+            waiting.classList.remove('hidden');
+
+        }else{
+
+            waiting.classList.add('hidden');
+
+        }
+
+
+        const container =
+        document.getElementById('slots-container');
+
+
+        container.innerHTML='';
+
+
+        for(let i=1;i<=10;i++){
+
+            const reg =
+            this.state.inscripciones.find(
+                x=>Number(x.numero_casilla)===i
+            );
+
+
+            const sala =
+            this.state.salas.find(
+                x=>Number(x.numero_casilla)===i
+            );
+
+
+            let estado =
+            '<span style="color:#00f2fe">[Disponible]</span>';
+
+            let info =
+            '<i>Crea un nuevo duelo</i>';
+
+            let boton='';
+
+            let credenciales='';
+
+
+            if(reg){
+
+                const esJ1 =
+                reg.j1_apodo === nickname;
+
+                const esJ2 =
+                reg.j2_apodo === nickname;
+
+                const completo =
+                !!reg.j1_apodo &&
+                !!reg.j2_apodo;
+
+
+                if(completo){
+
+                    estado =
+                    (
+                        reg.j1_pago_confirmado &&
+                        reg.j2_pago_confirmado
+                    )
+                    ?
+                    '<span style="color:var(--success)">[Duelo Confirmado]</span>'
+                    :
+                    '<span style="color:#ffb703">[Esperando Pago]</span>';
+
+                }else{
+
+                    estado =
+                    '<span style="color:#ffb703">[Falta Rival 1v1]</span>';
+
+                }
+
+
+                info =
+                `⚔️ <b>${this.escape(reg.j1_apodo)}</b>
+                vs
+                <b>${this.escape(reg.j2_apodo || 'Esperando oponente...')}</b>`;
+
+
+                if(esJ1 || esJ2){
+
+                    const roomId =
+                    sala?.room_id || 'Por definir';
+
+                    const roomPass =
+                    sala?.room_pass || 'Por definir';
+
+
+                    credenciales=`
+
+                    <div class="room-box">
+
+                    🔑 Sala ID:
+                    <b>${this.escape(roomId)}</b>
+
+                    |
+
+                    Pass:
+                    <b>${this.escape(roomPass)}</b>
+
+                    </div>
+
+                    `;
+
+                }
+
+
+                if(esJ1 || esJ2){
+
+                    boton=`
+
+                    <button
+                    class="btn-slot"
+                    style="background:#d9534f"
+                    onclick="App.salirDuelo(${reg.id},'${esJ1?'j1':'j2}',${completo})">
+
+                    Abandonar
+
+                    </button>
+
+                    `;
+
+                }else if(!reg.j2_apodo && !miDuelo){
+
+                    boton=`
+
+                    <button
+                    class="btn-slot"
+                    style="background:#7928ca"
+                    onclick="App.abrirModalUnirse(${reg.id})">
+
+                    Unirse como J2
+
+                    </button>
+
+                    `;
+
+                }else{
+
+                    boton=`
+
+                    <button
+                    class="btn-slot"
+                    style="opacity:.5"
+                    disabled>
+
+                    Ocupado
+
+                    </button>
+
+                    `;
+
+                }
+
+            }else{
+
+                if(!miDuelo){
+
+                    boton=`
+
+                    <button
+                    class="btn-slot"
+                    onclick="App.abrirModalCrear(${i})">
+
+                    Crear Duelo (J1)
+
+                    </button>
+
+                    `;
+
+                }else{
+
+                    boton=`
+
+                    <button
+                    class="btn-slot"
+                    style="opacity:.5"
+                    disabled>
+
+                    Ya en duelo
+
+                    </button>
+
+                    `;
+
+                }
+
             }
 
-            infoText = `⚔️ <b>${reg.j1_apodo}</b> vs <b>${reg.j2_apodo || 'Esperando oponente...'}</b>`;
 
-            const soyParte = esJ1 || esJ2;
-            const salaValida = reg.room_id && reg.room_id !== 'Por definir';
+            container.innerHTML += `
 
-            // Mostrar sala al costado si está confirmado y se tienen credenciales permanentes
-            if (soyParte && ambosPagados && salaValida) {
-              credencialesHTML = `
-                <div style="margin-top: 6px; background: rgba(0,242,195,0.08); border: 1px dashed var(--success); padding: 6px 8px; border-radius: 6px; font-size: 12px;">
-                  🔑 Sala ID: <b>${reg.room_id}</b> | Pass: <b>${reg.room_pass}</b>
-                </div>
-              `;
-            } else if (soyParte) {
-              credencialesHTML = `
-                <div style="margin-top: 6px; background: rgba(255,183,3,0.08); border: 1px dashed #ffb703; padding: 6px 8px; border-radius: 6px; font-size: 12px; color:#ffb703;">
-                  ⏳ Esperando confirmación de pagos / credenciales por el admin
-                </div>
-              `;
-            }
-
-            if (esJ1 || esJ2) {
-              btnHTML = `<button class="btn-slot" style="background:#d9534f;" onclick="App.salirDuelo(${reg.id}, '${esJ1 ? 'j1' : 'j2'}', ${completo})">Abandonar</button>`;
-            } else if (!reg.j2_apodo && !miDuelo) {
-              btnHTML = `<button class="btn-slot" style="background:#7928ca;" onclick="App.abrirModalUnirse(${reg.id})">Unirse como J2</button>`;
-            } else {
-              btnHTML = `<button class="btn-slot" style="opacity:0.5;" disabled>Ocupado</button>`;
-            }
-          } else {
-            if (!miDuelo) {
-              btnHTML = `<button class="btn-slot" onclick="App.abrirModalCrear(${i})">Crear Duelo (J1)</button>`;
-            } else {
-              btnHTML = `<button class="btn-slot" style="opacity:0.5;" disabled>Ya en duelo</button>`;
-            }
-          }
-
-          container.innerHTML += `
             <div class="slot-card">
-              <div style="flex-grow: 1; padding-right: 10px;">
-                <div class="slot-num">DUELO #${i} ${estadoHTML}</div>
-                <div class="slot-players">${infoText}</div>
-                ${credencialesHTML}
-              </div>
-              <div>${btnHTML}</div>
+
+                <div style="flex-grow:1;padding-right:10px">
+
+                    <div class="slot-num">
+
+                        DUELO #${i}
+
+                        ${estado}
+
+                    </div>
+
+                    <div class="slot-players">
+
+                        ${info}
+
+                    </div>
+
+                    ${credenciales}
+
+                </div>
+
+                <div>
+
+                    ${boton}
+
+                </div>
+
             </div>
-          `;
+
+            `;
+
         }
-      },
 
-      abrirModalCrear(casillaNum) {
-        document.getElementById('input-casilla-num').value = casillaNum;
-        document.getElementById('input-casilla-id').value = '';
-        document.getElementById('input-accion-tipo').value = 'crear_j1';
-        document.getElementById('titulo-modal-accion').innerText = `Crear Duelo #${casillaNum} (Jugador 1)`;
-        document.getElementById('yape_nro_op').value = '';
-        Views.mostrar('view-form-casilla');
-      },
+    },
 
-      abrirModalUnirse(dueloId) {
-        document.getElementById('input-casilla-id').value = dueloId;
-        document.getElementById('input-accion-tipo').value = 'unirse_j2';
-        document.getElementById('titulo-modal-accion').innerText = `Unirse al Duelo como Rival (Jugador 2)`;
-        document.getElementById('yape_nro_op').value = '';
-        Views.mostrar('view-form-casilla');
-      },
 
-      async procesarInscripcion(e) {
+    abrirModalCrear(numero){
+
+        document
+        .getElementById('input-casilla-num')
+        .value=numero;
+
+
+        document
+        .getElementById('input-accion-tipo')
+        .value='crear';
+
+
+        document
+        .getElementById('input-inscripcion-id')
+        .value='';
+
+
+        document
+        .getElementById('titulo-modal-accion')
+        .textContent=
+        `Crear Duelo #${numero} (Jugador 1)`;
+
+
+        document
+        .getElementById('yape_nro_op')
+        .value='';
+
+
+        this.mostrar('view-form-casilla');
+
+    },
+
+
+    abrirModalUnirse(id){
+
+        document
+        .getElementById('input-inscripcion-id')
+        .value=id;
+
+
+        document
+        .getElementById('input-accion-tipo')
+        .value='unirse';
+
+
+        document
+        .getElementById('titulo-modal-accion')
+        .textContent=
+        'Unirse al Duelo como Rival (Jugador 2)';
+
+
+        document
+        .getElementById('yape_nro_op')
+        .value='';
+
+
+        this.mostrar('view-form-casilla');
+
+    },
+
+
+    async procesarInscripcion(e){
+
         e.preventDefault();
-        const btnSubmit = document.getElementById('btn-enviar-pago');
-        btnSubmit.disabled = true;
-        btnSubmit.innerText = "PROCESANDO...";
 
-        try {
-          const tipo = document.getElementById('input-accion-tipo').value;
-          const nroOp = document.getElementById('yape_nro_op').value.trim();
-          const nick = state.perfilActual.nickname;
-          const id_ff = state.perfilActual.id_freefire;
-          const wsp = state.perfilActual.whatsapp;
 
-          if (tipo === 'crear_j1') {
-            const casillaNum = parseInt(document.getElementById('input-casilla-num').value);
-            const payload = {
-              numero_casilla: casillaNum,
-              j1_apodo: nick,
-              j1_id: id_ff,
-              j1_wsp: wsp,
-              j1_nro_operacion: nroOp,
-              j1_pago_confirmado: false
-            };
-            const { error } = await db.from('inscripciones').insert([payload]);
-            if (error) throw error;
-          } else {
-            const dueloId = parseInt(document.getElementById('input-casilla-id').value);
-            const payload = {
-              j2_apodo: nick,
-              j2_id: id_ff,
-              j2_wsp: wsp,
-              j2_nro_operacion: nroOp,
-              j2_pago_confirmado: false
-            };
-            const { error } = await db.from('inscripciones').update(payload).eq('id', dueloId);
-            if (error) throw error;
-          }
+        const btn =
+        document.getElementById('btn-enviar-pago');
 
-          alert("¡Inscripción PVP registrada con éxito! Espera la validación del administrador.");
-          this.cargarDuelos();
-        } catch (err) {
-          alert("Error al registrar inscripción: " + err.message);
-        } finally {
-          btnSubmit.disabled = false;
-          btnSubmit.innerText = "ENVIAR PAGO Y PARTICIPAR";
+
+        btn.disabled=true;
+        btn.textContent='PROCESANDO...';
+
+
+        try{
+
+            const tipo =
+            document
+            .getElementById('input-accion-tipo')
+            .value;
+
+
+            const numero =
+            Number(
+                document
+                .getElementById('input-casilla-num')
+                .value
+            );
+
+
+            const idInscripcion =
+            Number(
+                document
+                .getElementById('input-inscripcion-id')
+                .value
+            );
+
+
+            const operacion =
+            document
+            .getElementById('yape_nro_op')
+            .value
+            .trim();
+
+
+            const perfil =
+            this.state.perfil;
+
+
+            if(tipo==='crear'){
+
+                const existe =
+                this.state.inscripciones.find(
+                    x =>
+                    Number(x.numero_casilla)===numero
+                );
+
+
+                if(existe)
+                    throw new Error(
+                        'Este duelo ya fue ocupado.'
+                    );
+
+
+                const {error} =
+                await db
+                .from('inscripciones')
+                .insert({
+
+                    numero_casilla:numero,
+
+                    j1_apodo:perfil.nickname,
+
+                    j1_id:perfil.id_freefire,
+
+                    j1_wsp:perfil.whatsapp,
+
+                    j1_nro_operacion:operacion
+
+                });
+
+
+                if(error)
+                    throw error;
+
+
+            }else{
+
+                const {error} =
+                await db
+                .from('inscripciones')
+                .update({
+
+                    j2_apodo:perfil.nickname,
+
+                    j2_id:perfil.id_freefire,
+
+                    j2_wsp:perfil.whatsapp,
+
+                    j2_nro_operacion:operacion
+
+                })
+                .eq('id',idInscripcion)
+                .is('j2_apodo',null);
+
+
+                if(error)
+                    throw error;
+
+            }
+
+
+            alert(
+                '¡Inscripción registrada correctamente! '+
+                'Espera la validación del administrador.'
+            );
+
+
+            await this.cargarDuelos();
+
+
+        }catch(error){
+
+            alert(
+                'No se pudo registrar: '+
+                error.message
+            );
+
+        }finally{
+
+            btn.disabled=false;
+            btn.textContent=
+            'ENVIAR PAGO Y PARTICIPAR';
+
         }
-      },
 
-      async salirDuelo(id, rol, completo) {
-        if (confirm("¿Estás seguro de abandonar este duelo?")) {
-          if (rol === 'j1' || !completo) {
-            await db.from('inscripciones').delete().eq('id', id);
-          } else {
-            await db.from('inscripciones').update({
-              j2_apodo: null,
-              j2_id: null,
-              j2_wsp: null,
-              j2_nro_operacion: null,
-              j2_pago_confirmado: false
-            }).eq('id', id);
-          }
-          this.cargarDuelos();
+    },
+
+
+    async salirDuelo(id,rol,completo){
+
+        if(
+            !confirm(
+                '¿Estás seguro de abandonar este duelo?'
+            )
+        )
+            return;
+
+
+        if(rol==='j1'){
+
+            const {error} =
+            await db
+            .from('inscripciones')
+            .delete()
+            .eq('id',id);
+
+
+            if(error)
+                return alert(error.message);
+
+        }else{
+
+            const {error} =
+            await db
+            .from('inscripciones')
+            .update({
+
+                j2_apodo:null,
+                j2_id:null,
+                j2_wsp:null,
+                j2_nro_operacion:null,
+                j2_pago_confirmado:false
+
+            })
+            .eq('id',id);
+
+
+            if(error)
+                return alert(error.message);
+
         }
-      },
 
-      apurarAdmin() {
-        alert("🔔 ¡Aviso enviado al administrador!");
-      },
 
-      async cerrarSesion() {
+        await this.cargarDuelos();
+
+    },
+
+
+    apurarAdmin(){
+
+        alert(
+            '🔔 Aviso enviado al administrador.'
+        );
+
+    },
+
+
+    async cerrarSesion(){
+
         await db.auth.signOut();
-        window.location.reload();
-      },
 
-      mostrarSlots() {
-        Views.mostrar('view-slots');
+        location.reload();
+
+    },
+
+
+    mostrarSlots(){
+
         this.cargarDuelos();
-      }
-    };
-  })();
 
-  document.addEventListener('DOMContentLoaded', () => App.init());
+    },
+
+
+    escape(value){
+
+        return String(value ?? '')
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#039;');
+
+    }
+
+};
+
+
+document
+.getElementById('form-perfil')
+.addEventListener(
+    'submit',
+    e=>App.guardarPerfil(e)
+);
+
+
+document
+.getElementById('form-casilla-accion')
+.addEventListener(
+    'submit',
+    e=>App.procesarInscripcion(e)
+);
+
+
+document.addEventListener(
+    'DOMContentLoaded',
+    ()=>App.init()
+);
+
 </script>
+
 </body>
 </html>
