@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -11,7 +12,7 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Rajdhani:wght@500;600;700&display=swap');
 
-:root {
+:root{
     --bg:#050308;
     --card-bg:rgba(16,10,24,.92);
     --primary:#b537f2;
@@ -23,11 +24,11 @@
     --success:#00f2c3;
 }
 
-* {
+*{
     box-sizing:border-box;
 }
 
-body {
+body{
     margin:0;
     font-family:'Rajdhani',sans-serif;
     background:radial-gradient(circle at top,#170c22 0%,#020103 70%);
@@ -38,7 +39,7 @@ body {
     min-height:100vh;
 }
 
-.container {
+.container{
     width:100%;
     max-width:620px;
     background:var(--card-bg);
@@ -49,7 +50,7 @@ body {
     box-shadow:0 20px 60px rgba(0,0,0,.85);
 }
 
-h1 {
+h1{
     font-family:'Teko',sans-serif;
     text-align:center;
     color:var(--primary-light);
@@ -59,14 +60,14 @@ h1 {
     text-transform:uppercase;
 }
 
-.subtitle {
+.subtitle{
     text-align:center;
     color:var(--subtext);
     font-size:13px;
     margin-bottom:20px;
 }
 
-.user-bar {
+.user-bar{
     display:flex;
     justify-content:space-between;
     align-items:center;
@@ -77,7 +78,7 @@ h1 {
     border:1px solid var(--border);
 }
 
-label {
+label{
     display:block;
     margin-bottom:4px;
     font-size:11px;
@@ -85,7 +86,7 @@ label {
     font-weight:700;
 }
 
-input {
+input{
     width:100%;
     padding:10px;
     margin-bottom:10px;
@@ -96,12 +97,12 @@ input {
     font-family:'Rajdhani',sans-serif;
 }
 
-input:focus {
+input:focus{
     outline:none;
     border-color:var(--primary);
 }
 
-button {
+button{
     width:100%;
     padding:12px;
     background:linear-gradient(135deg,var(--primary),var(--primary-dark));
@@ -114,22 +115,22 @@ button {
     text-transform:uppercase;
 }
 
-button:disabled {
+button:disabled{
     opacity:.5;
     cursor:not-allowed;
 }
 
-.btn-google {
+.btn-google{
     background:#ea4335;
     margin-bottom:10px;
 }
 
-.btn-facebook {
+.btn-facebook{
     background:#1877f2;
     margin-bottom:10px;
 }
 
-.btn-sec {
+.btn-sec{
     background:transparent;
     border:1px solid var(--border);
     color:var(--subtext);
@@ -137,14 +138,14 @@ button:disabled {
     font-size:16px;
 }
 
-.btn-small {
+.btn-small{
     width:auto;
     padding:4px 10px;
     font-size:14px;
     border-radius:6px;
 }
 
-.yape-box {
+.yape-box{
     background:rgba(116,34,132,.4);
     border:1px solid #a32dbb;
     border-radius:14px;
@@ -153,20 +154,20 @@ button:disabled {
     margin-bottom:15px;
 }
 
-.yape-title {
+.yape-title{
     color:#d175ed;
     font-family:'Teko',sans-serif;
     font-size:24px;
 }
 
-.yape-number {
+.yape-number{
     font-size:26px;
     font-weight:700;
     color:#fff;
     margin:6px 0;
 }
 
-.slots-grid {
+.slots-grid{
     display:flex;
     flex-direction:column;
     gap:10px;
@@ -175,7 +176,7 @@ button:disabled {
     padding-right:4px;
 }
 
-.slot-card {
+.slot-card{
     background:rgba(20,10,30,.85);
     border:1px solid var(--border);
     border-radius:10px;
@@ -186,24 +187,24 @@ button:disabled {
     gap:10px;
 }
 
-.slot-num {
+.slot-num{
     font-family:'Teko',sans-serif;
     font-size:20px;
 }
 
-.slot-players {
+.slot-players{
     font-size:13px;
     color:var(--subtext);
     line-height:1.3;
 }
 
-.btn-slot {
+.btn-slot{
     width:auto;
     padding:6px 14px;
     font-size:15px;
 }
 
-.room-box {
+.room-box{
     margin-top:7px;
     background:rgba(0,242,195,.08);
     border:1px dashed var(--success);
@@ -212,7 +213,7 @@ button:disabled {
     font-size:12px;
 }
 
-.hidden {
+.hidden{
     display:none!important;
 }
 </style>
@@ -222,7 +223,6 @@ button:disabled {
 
 <div class="container">
 
-<!-- LOGIN -->
 <div id="view-auth">
 
 <h1>PVP Free Fire - 1v1</h1>
@@ -243,8 +243,6 @@ Continuar con Facebook
 
 </div>
 
-
-<!-- PERFIL -->
 <div id="view-profile" class="hidden">
 
 <h2 style="font-family:'Teko';text-align:center;font-size:28px;">
@@ -281,8 +279,6 @@ Volver
 
 </div>
 
-
-<!-- DUELOS -->
 <div id="view-slots" class="hidden">
 
 <h1>Duelos PVP (1v1)</h1>
@@ -336,8 +332,6 @@ Cargando duelos...
 
 </div>
 
-
-<!-- PAGO -->
 <div id="view-form-casilla" class="hidden">
 
 <h2
@@ -390,21 +384,18 @@ Volver atrás
 
 </div>
 
-
 <script>
 
 const SUPABASE_URL =
 'https://eaqagfaarjsonclcpahd.supabase.co';
 
 const SUPABASE_KEY =
-'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFhZ2Fhcmpzb25jbGNwYWhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzODc2NDIsImV4cCI6MjEwMzk2MzY0Mn0.-9b9qzfJ4oZANgQdLTy2vYTMbfj1ffiTEVrQY-QSYPs';
-
+'sb_publishable_FHr2wWeE-0jQK44Y86o_7g_iiiWyMqk';
 
 const db = window.supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
 );
-
 
 const App = {
 
@@ -414,7 +405,6 @@ const App = {
         inscripciones:[],
         salas:[]
     },
-
 
     ocultarTodo(){
 
@@ -426,9 +416,7 @@ const App = {
         ].forEach(id =>
             document.getElementById(id).classList.add('hidden')
         );
-
     },
-
 
     mostrar(id){
 
@@ -437,18 +425,13 @@ const App = {
         document
             .getElementById(id)
             .classList.remove('hidden');
-
     },
-
 
     async init(){
 
         const {
-            data:{
-                session
-            }
+            data:{session}
         } = await db.auth.getSession();
-
 
         if(session){
 
@@ -459,9 +442,7 @@ const App = {
         }else{
 
             this.mostrar('view-auth');
-
         }
-
 
         db.auth.onAuthStateChange(
             async(event,session)=>{
@@ -471,7 +452,6 @@ const App = {
                     this.state.usuario = session.user;
 
                     await this.cargarPerfil();
-
                 }
 
                 if(!session){
@@ -480,12 +460,9 @@ const App = {
                     this.state.perfil = null;
 
                     this.mostrar('view-auth');
-
                 }
-
             }
         );
-
 
         db.channel('torneo-publico')
 
@@ -516,50 +493,48 @@ const App = {
         )
 
         .subscribe();
-
     },
-
 
     async loginSocial(provider){
 
         const {error} =
-        await db.auth.signInWithOAuth({
+            await db.auth.signInWithOAuth({
 
-            provider,
+                provider,
 
-            options:{
-                redirectTo:window.location.href
-            }
-
-        });
+                options:{
+                    redirectTo:window.location.href
+                }
+            });
 
         if(error)
-            alert('Error de inicio de sesión: '+error.message);
-
+            alert(
+                'Error de inicio de sesión: '+
+                error.message
+            );
     },
-
 
     async cargarPerfil(){
 
         if(!this.state.usuario)
             return;
 
-
         const {data,error} =
-        await db
-        .from('perfiles')
-        .select('*')
-        .eq('id',this.state.usuario.id)
-        .maybeSingle();
-
+            await db
+            .from('perfiles')
+            .select('*')
+            .eq('id',this.state.usuario.id)
+            .maybeSingle();
 
         if(error){
 
-            alert('Error cargando perfil: '+error.message);
+            alert(
+                'Error cargando perfil: '+
+                error.message
+            );
+
             return;
-
         }
-
 
         if(data){
 
@@ -578,83 +553,64 @@ const App = {
             .classList.add('hidden');
 
             this.mostrar('view-profile');
-
         }
-
     },
-
 
     async abrirFormularioEditar(){
 
         if(!this.state.perfil)
             return;
 
-
         const nickname =
             this.state.perfil.nickname;
 
-
         const {data} =
-        await db
-        .from('inscripciones')
-        .select('id,j1_apodo,j2_apodo')
-        .or(
-            `j1_apodo.eq.${nickname},j2_apodo.eq.${nickname}`
-        );
-
+            await db
+            .from('inscripciones')
+            .select('id,j1_apodo,j2_apodo');
 
         const estaInscrito =
-            data && data.length > 0;
-
+            data &&
+            data.some(
+                x =>
+                x.j1_apodo === nickname ||
+                x.j2_apodo === nickname
+            );
 
         const nickInput =
-        document.getElementById('prof_nickname');
+            document.getElementById('prof_nickname');
 
-
-        nickInput.value =
-        nickname;
-
-
-        nickInput.disabled =
-        estaInscrito;
-
+        nickInput.value = nickname;
+        nickInput.disabled = estaInscrito;
 
         document
         .getElementById('prof_id')
         .value =
         this.state.perfil.id_freefire || '';
 
-
         document
         .getElementById('prof_wsp')
         .value =
         this.state.perfil.whatsapp || '';
 
-
         document
         .getElementById('btn-cancel-profile')
         .classList.remove('hidden');
 
-
         this.mostrar('view-profile');
-
     },
-
 
     async guardarPerfil(e){
 
         e.preventDefault();
 
-
         const nickInput =
-        document.getElementById('prof_nickname');
-
+            document.getElementById('prof_nickname');
 
         const nickname =
-        nickInput.disabled
-        ? this.state.perfil.nickname
-        : nickInput.value.trim();
-
+            nickInput.disabled
+            ? this.state.perfil.nickname
+            : nickInput.value.trim();
 
         const payload={
 
@@ -673,37 +629,32 @@ const App = {
             .getElementById('prof_wsp')
             .value
             .trim()
-
         };
 
-
         const {error} =
-        await db
-        .from('perfiles')
-        .upsert(payload);
-
+            await db
+            .from('perfiles')
+            .upsert(payload);
 
         if(error){
 
-            alert('Error guardando perfil: '+error.message);
-            return;
+            alert(
+                'Error guardando perfil: '+
+                error.message
+            );
 
+            return;
         }
 
-
         await this.cargarPerfil();
-
     },
-
 
     async cargarDuelos(){
 
         if(!this.state.perfil)
             return;
 
-
         this.mostrar('view-slots');
-
 
         const [
             inscripcionesResult,
@@ -718,9 +669,7 @@ const App = {
             .from('salas')
             .select('*')
             .order('numero_casilla')
-
         ]);
-
 
         if(inscripcionesResult.error){
 
@@ -730,9 +679,7 @@ const App = {
             );
 
             return;
-
         }
-
 
         if(salasResult.error){
 
@@ -742,33 +689,26 @@ const App = {
             );
 
             return;
-
         }
 
-
         this.state.inscripciones =
-        inscripcionesResult.data || [];
-
+            inscripcionesResult.data || [];
 
         this.state.salas =
-        salasResult.data || [];
-
+            salasResult.data || [];
 
         const nickname =
-        this.state.perfil.nickname;
-
+            this.state.perfil.nickname;
 
         const miDuelo =
-        this.state.inscripciones.find(
-            d =>
-            d.j1_apodo === nickname ||
-            d.j2_apodo === nickname
-        );
-
+            this.state.inscripciones.find(
+                d =>
+                d.j1_apodo === nickname ||
+                d.j2_apodo === nickname
+            );
 
         const waiting =
-        document.getElementById('waiting-actions');
-
+            document.getElementById('waiting-actions');
 
         if(
             miDuelo &&
@@ -786,54 +726,45 @@ const App = {
         }else{
 
             waiting.classList.add('hidden');
-
         }
 
-
         const container =
-        document.getElementById('slots-container');
-
+            document.getElementById('slots-container');
 
         container.innerHTML='';
-
 
         for(let i=1;i<=10;i++){
 
             const reg =
-            this.state.inscripciones.find(
-                x=>Number(x.numero_casilla)===i
-            );
-
+                this.state.inscripciones.find(
+                    x=>Number(x.numero_casilla)===i
+                );
 
             const sala =
-            this.state.salas.find(
-                x=>Number(x.numero_casilla)===i
-            );
-
+                this.state.salas.find(
+                    x=>Number(x.numero_casilla)===i
+                );
 
             let estado =
-            '<span style="color:#00f2fe">[Disponible]</span>';
+                '<span style="color:#00f2fe">[Disponible]</span>';
 
             let info =
-            '<i>Crea un nuevo duelo</i>';
+                '<i>Crea un nuevo duelo</i>';
 
             let boton='';
-
             let credenciales='';
-
 
             if(reg){
 
                 const esJ1 =
-                reg.j1_apodo === nickname;
+                    reg.j1_apodo === nickname;
 
                 const esJ2 =
-                reg.j2_apodo === nickname;
+                    reg.j2_apodo === nickname;
 
                 const completo =
-                !!reg.j1_apodo &&
-                !!reg.j2_apodo;
-
+                    !!reg.j1_apodo &&
+                    !!reg.j2_apodo;
 
                 if(completo){
 
@@ -851,89 +782,67 @@ const App = {
 
                     estado =
                     '<span style="color:#ffb703">[Falta Rival 1v1]</span>';
-
                 }
-
 
                 info =
                 `⚔️ <b>${this.escape(reg.j1_apodo)}</b>
                 vs
                 <b>${this.escape(reg.j2_apodo || 'Esperando oponente...')}</b>`;
 
-
                 if(esJ1 || esJ2){
 
                     const roomId =
-                    sala?.room_id || 'Por definir';
+                        sala?.room_id || 'Por definir';
 
                     const roomPass =
-                    sala?.room_pass || 'Por definir';
-
+                        sala?.room_pass || 'Por definir';
 
                     credenciales=`
-
                     <div class="room-box">
-
-                    🔑 Sala ID:
-                    <b>${this.escape(roomId)}</b>
-
-                    |
-
-                    Pass:
-                    <b>${this.escape(roomPass)}</b>
-
+                        🔑 Sala ID:
+                        <b>${this.escape(roomId)}</b>
+                        |
+                        Pass:
+                        <b>${this.escape(roomPass)}</b>
                     </div>
-
                     `;
-
                 }
-
 
                 if(esJ1 || esJ2){
 
                     boton=`
-
                     <button
                     class="btn-slot"
                     style="background:#d9534f"
-                    onclick="App.salirDuelo(${reg.id},'${esJ1?'j1':'j2}',${completo})">
-
-                    Abandonar
-
+                    onclick="App.salirDuelo(
+                        ${reg.id},
+                        '${esJ1?'j1':'j2'}'
+                    )">
+                        Abandonar
                     </button>
-
                     `;
 
                 }else if(!reg.j2_apodo && !miDuelo){
 
                     boton=`
-
                     <button
                     class="btn-slot"
                     style="background:#7928ca"
                     onclick="App.abrirModalUnirse(${reg.id})">
-
-                    Unirse como J2
-
+                        Unirse como J2
                     </button>
-
                     `;
 
                 }else{
 
                     boton=`
-
                     <button
                     class="btn-slot"
                     style="opacity:.5"
                     disabled>
-
-                    Ocupado
-
+                        Ocupado
                     </button>
-
                     `;
-
                 }
 
             }else{
@@ -941,36 +850,25 @@ const App = {
                 if(!miDuelo){
 
                     boton=`
-
                     <button
                     class="btn-slot"
                     onclick="App.abrirModalCrear(${i})">
-
-                    Crear Duelo (J1)
-
+                        Crear Duelo (J1)
                     </button>
-
                     `;
 
                 }else{
 
                     boton=`
-
                     <button
                     class="btn-slot"
                     style="opacity:.5"
                     disabled>
-
-                    Ya en duelo
-
+                        Ya en duelo
                     </button>
-
                     `;
-
                 }
-
             }
-
 
             container.innerHTML += `
 
@@ -979,17 +877,12 @@ const App = {
                 <div style="flex-grow:1;padding-right:10px">
 
                     <div class="slot-num">
-
                         DUELO #${i}
-
                         ${estado}
-
                     </div>
 
                     <div class="slot-players">
-
                         ${info}
-
                     </div>
 
                     ${credenciales}
@@ -997,19 +890,13 @@ const App = {
                 </div>
 
                 <div>
-
                     ${boton}
-
                 </div>
 
             </div>
-
             `;
-
         }
-
     },
-
 
     abrirModalCrear(numero){
 
@@ -1017,32 +904,25 @@ const App = {
         .getElementById('input-casilla-num')
         .value=numero;
 
-
         document
         .getElementById('input-accion-tipo')
         .value='crear';
-
 
         document
         .getElementById('input-inscripcion-id')
         .value='';
 
-
         document
         .getElementById('titulo-modal-accion')
-        .textContent=
+        .textContent =
         `Crear Duelo #${numero} (Jugador 1)`;
-
 
         document
         .getElementById('yape_nro_op')
         .value='';
 
-
         this.mostrar('view-form-casilla');
-
     },
-
 
     abrirModalUnirse(id){
 
@@ -1050,147 +930,133 @@ const App = {
         .getElementById('input-inscripcion-id')
         .value=id;
 
-
         document
         .getElementById('input-accion-tipo')
         .value='unirse';
 
-
         document
         .getElementById('titulo-modal-accion')
-        .textContent=
+        .textContent =
         'Unirse al Duelo como Rival (Jugador 2)';
-
 
         document
         .getElementById('yape_nro_op')
         .value='';
 
-
         this.mostrar('view-form-casilla');
-
     },
-
 
     async procesarInscripcion(e){
 
         e.preventDefault();
 
-
         const btn =
-        document.getElementById('btn-enviar-pago');
-
+            document.getElementById('btn-enviar-pago');
 
         btn.disabled=true;
         btn.textContent='PROCESANDO...';
 
-
         try{
 
             const tipo =
-            document
-            .getElementById('input-accion-tipo')
-            .value;
-
+                document
+                .getElementById('input-accion-tipo')
+                .value;
 
             const numero =
-            Number(
-                document
-                .getElementById('input-casilla-num')
-                .value
-            );
-
+                Number(
+                    document
+                    .getElementById('input-casilla-num')
+                    .value
+                );
 
             const idInscripcion =
-            Number(
-                document
-                .getElementById('input-inscripcion-id')
-                .value
-            );
-
+                Number(
+                    document
+                    .getElementById('input-inscripcion-id')
+                    .value
+                );
 
             const operacion =
-            document
-            .getElementById('yape_nro_op')
-            .value
-            .trim();
-
+                document
+                .getElementById('yape_nro_op')
+                .value
+                .trim();
 
             const perfil =
-            this.state.perfil;
+                this.state.perfil;
 
+            if(!perfil)
+                throw new Error(
+                    'No se encontró tu perfil.'
+                );
+
+            if(!operacion)
+                throw new Error(
+                    'Ingresa el código de operación.'
+                );
 
             if(tipo==='crear'){
 
                 const existe =
-                this.state.inscripciones.find(
-                    x =>
-                    Number(x.numero_casilla)===numero
-                );
-
+                    this.state.inscripciones.find(
+                        x =>
+                        Number(x.numero_casilla)===numero
+                    );
 
                 if(existe)
                     throw new Error(
                         'Este duelo ya fue ocupado.'
                     );
 
-
                 const {error} =
-                await db
-                .from('inscripciones')
-                .insert({
+                    await db
+                    .from('inscripciones')
+                    .insert({
 
-                    numero_casilla:numero,
+                        numero_casilla:numero,
 
-                    j1_apodo:perfil.nickname,
+                        j1_apodo:perfil.nickname,
 
-                    j1_id:perfil.id_freefire,
+                        j1_id:perfil.id_freefire,
 
-                    j1_wsp:perfil.whatsapp,
+                        j1_wsp:perfil.whatsapp,
 
-                    j1_nro_operacion:operacion
-
-                });
-
+                        j1_nro_operacion:operacion
+                    });
 
                 if(error)
                     throw error;
-
 
             }else{
 
                 const {error} =
-                await db
-                .from('inscripciones')
-                .update({
+                    await db
+                    .from('inscripciones')
+                    .update({
 
-                    j2_apodo:perfil.nickname,
+                        j2_apodo:perfil.nickname,
 
-                    j2_id:perfil.id_freefire,
+                        j2_id:perfil.id_freefire,
 
-                    j2_wsp:perfil.whatsapp,
+                        j2_wsp:perfil.whatsapp,
 
-                    j2_nro_operacion:operacion
+                        j2_nro_operacion:operacion
 
-                })
-                .eq('id',idInscripcion)
-                .is('j2_apodo',null);
-
+                    })
+                    .eq('id',idInscripcion)
+                    .is('j2_apodo',null);
 
                 if(error)
                     throw error;
-
             }
-
 
             alert(
                 '¡Inscripción registrada correctamente! '+
                 'Espera la validación del administrador.'
             );
 
-
             await this.cargarDuelos();
-
 
         }catch(error){
 
@@ -1203,31 +1069,24 @@ const App = {
 
             btn.disabled=false;
             btn.textContent=
-            'ENVIAR PAGO Y PARTICIPAR';
-
+                'ENVIAR PAGO Y PARTICIPAR';
         }
-
     },
 
+    async salirDuelo(id,rol){
 
-    async salirDuelo(id,rol,completo){
-
-        if(
-            !confirm(
-                '¿Estás seguro de abandonar este duelo?'
-            )
-        )
+        if(!confirm(
+            '¿Estás seguro de abandonar este duelo?'
+        ))
             return;
-
 
         if(rol==='j1'){
 
             const {error} =
-            await db
-            .from('inscripciones')
-            .delete()
-            .eq('id',id);
-
+                await db
+                .from('inscripciones')
+                .delete()
+                .eq('id',id);
 
             if(error)
                 return alert(error.message);
@@ -1235,55 +1094,44 @@ const App = {
         }else{
 
             const {error} =
-            await db
-            .from('inscripciones')
-            .update({
+                await db
+                .from('inscripciones')
+                .update({
 
-                j2_apodo:null,
-                j2_id:null,
-                j2_wsp:null,
-                j2_nro_operacion:null,
-                j2_pago_confirmado:false
+                    j2_apodo:null,
+                    j2_id:null,
+                    j2_wsp:null,
+                    j2_nro_operacion:null,
+                    j2_pago_confirmado:false
 
-            })
-            .eq('id',id);
-
+                })
+                .eq('id',id);
 
             if(error)
                 return alert(error.message);
-
         }
 
-
         await this.cargarDuelos();
-
     },
-
 
     apurarAdmin(){
 
         alert(
             '🔔 Aviso enviado al administrador.'
         );
-
     },
-
 
     async cerrarSesion(){
 
         await db.auth.signOut();
 
         location.reload();
-
     },
-
 
     mostrarSlots(){
 
         this.cargarDuelos();
-
     },
-
 
     escape(value){
 
@@ -1293,11 +1141,8 @@ const App = {
         .replace(/>/g,'&gt;')
         .replace(/"/g,'&quot;')
         .replace(/'/g,'&#039;');
-
     }
-
 };
-
 
 document
 .getElementById('form-perfil')
@@ -1306,14 +1151,12 @@ document
     e=>App.guardarPerfil(e)
 );
 
-
 document
 .getElementById('form-casilla-accion')
 .addEventListener(
     'submit',
     e=>App.procesarInscripcion(e)
 );
-
 
 document.addEventListener(
     'DOMContentLoaded',
